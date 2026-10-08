@@ -41,3 +41,12 @@ failing and the passing `lab1` run, and the pull request checks. Crop to the
 relevant part and hide tokens, passwords and personal data.
 
 - Image and caption: ________
+
+![lab1 qui échoue](images/lab-01-failing-lab1.png)
+Le test lab1 qui échoue avant la correction, sur la branche lab01/fix-team-slug.
+
+![lab1 qui passe](images/lab-01-passing-lab1.png)
+Les 3 tests lab1 qui passent après la correction.
+
+![lab1 validation](images/fixteam.png)
+La pull request après notre fix
