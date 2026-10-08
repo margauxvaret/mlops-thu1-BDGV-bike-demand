@@ -1,7 +1,7 @@
 # Team working agreement
 
-- Team and repository (`mlops-<session>-<team-name>-bike-demand`): ________
-- Members: ________
+- Team and repository (`mlops-<session>-<team-name>-bike-demand`): BDGV
+- Members: Margaux Varet, Gabrielle Dolbeau, Pierre Guillois and Victor Bougro
 - Current driver / reviewer / evidence recorder: ________
 - Fourth member's temporary responsibility, if applicable: ________
 
