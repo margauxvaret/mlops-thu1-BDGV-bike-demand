@@ -1,5 +1,5 @@
-# Python 3.12, same as .python-version and requires-python
-FROM python:3.12-slim-trixie
+# Python 3.12, same as .python-version and requires-python; digest pins the exact base
+FROM python:3.12-slim-trixie@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
 
 # tracking.training_commit() calls git: without it the baseline crashes
 RUN apt-get update \
@@ -10,6 +10,13 @@ RUN apt-get update \
 COPY --from=ghcr.io/astral-sh/uv:0.12.23 /uv /uvx /bin/
 
 WORKDIR /app
+
+# Image Python only, no uv cache in layers; MLflow 3 telemetry is an outbound call
+ENV UV_PYTHON_DOWNLOADS=never \
+    UV_NO_CACHE=1 \
+    MLFLOW_DISABLE_TELEMETRY=true \
+    DO_NOT_TRACK=true \
+    PYTHONUNBUFFERED=1
 
 # Lock first: this layer is reused until pyproject.toml or uv.lock change
 COPY pyproject.toml uv.lock .python-version ./
@@ -28,4 +35,9 @@ COPY tests ./tests
 
 # Use the locked venv directly at run time
 ENV PATH="/app/.venv/bin:$PATH"
+
+# Link the image to the commit it was built from
+ARG GIT_COMMIT=unknown
+LABEL org.opencontainers.image.revision=$GIT_COMMIT
+
 CMD ["python", "-m", "bike_demand.train", "--config", "configs/baseline.yaml"]
