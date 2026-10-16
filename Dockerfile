@@ -18,8 +18,13 @@ RUN uv sync --locked --no-install-project
 # Data snapshot, config and code, then install the project from the lock
 COPY data ./data
 COPY configs ./configs
+# Files preflight (and so the infra tests) requires
+COPY README.md ./
+COPY reports/week-01-team.md ./reports/week-01-team.md
+COPY .github/workflows/ci.yml ./.github/workflows/ci.yml
 COPY src ./src
 RUN uv sync --locked
+COPY tests ./tests
 
 # Use the locked venv directly at run time
 ENV PATH="/app/.venv/bin:$PATH"
