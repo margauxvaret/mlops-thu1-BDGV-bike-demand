@@ -1,0 +1,18 @@
+# Allowlist: nothing enters the build except what the image needs
+*
+!pyproject.toml
+!uv.lock
+!.python-version
+!src/
+!configs/
+!data/
+!tests/
+!README.md
+!reports/week-01-team.md
+!.github/workflows/ci.yml
+
+# Never, even inside allowed folders
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.env

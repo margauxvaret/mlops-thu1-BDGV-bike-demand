@@ -1,0 +1,82 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.56kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim-trixie@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
+#2 DONE 0.0s
+
+#3 [internal] load metadata for ghcr.io/astral-sh/uv:0.12.23
+#3 DONE 0.7s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 336B 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 1.69kB 0.1s done
+#5 DONE 0.1s
+
+#6 [stage-0  1/14] FROM docker.io/library/python:3.12-slim-trixie@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
+#6 resolve docker.io/library/python:3.12-slim-trixie@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 0.1s done
+#6 DONE 0.1s
+
+#7 FROM ghcr.io/astral-sh/uv:0.12.23@sha256:61d393e44e249f2e4b526b6c7ddcecce245946826e608e11c93ad4f5bba55b21
+#7 resolve ghcr.io/astral-sh/uv:0.12.23@sha256:61d393e44e249f2e4b526b6c7ddcecce245946826e608e11c93ad4f5bba55b21 0.1s done
+#7 DONE 0.1s
+
+#8 [stage-0  6/14] RUN uv sync --locked --no-install-project
+#8 CACHED
+
+#9 [stage-0  7/14] COPY data ./data
+#9 CACHED
+
+#10 [stage-0 10/14] COPY reports/week-01-team.md ./reports/week-01-team.md
+#10 CACHED
+
+#11 [stage-0  2/14] RUN apt-get update     && apt-get install -y --no-install-recommends git     && rm -rf /var/lib/apt/lists/*
+#11 CACHED
+
+#12 [stage-0  3/14] COPY --from=ghcr.io/astral-sh/uv:0.12.23 /uv /uvx /bin/
+#12 CACHED
+
+#13 [stage-0  5/14] COPY pyproject.toml uv.lock .python-version ./
+#13 CACHED
+
+#14 [stage-0  9/14] COPY README.md ./
+#14 CACHED
+
+#15 [stage-0  4/14] WORKDIR /app
+#15 CACHED
+
+#16 [stage-0  8/14] COPY configs ./configs
+#16 CACHED
+
+#17 [stage-0 11/14] COPY .github/workflows/ci.yml ./.github/workflows/ci.yml
+#17 CACHED
+
+#18 [stage-0 12/14] COPY src ./src
+#18 DONE 0.1s
+
+#19 [stage-0 13/14] RUN uv sync --locked
+#19 0.903 Resolved 98 packages in 3ms
+#19 0.927    Building bike-demand @ file:///app
+#19 0.934       Built bike-demand @ file:///app
+#19 0.948 Prepared 1 package in 25ms
+#19 0.954 Installed 1 package in 5ms
+#19 0.954  + bike-demand==0.1.0 (from file:///app)
+#19 DONE 1.0s
+
+#20 [stage-0 14/14] COPY tests ./tests
+#20 DONE 0.0s
+
+#21 exporting to image
+#21 exporting layers 0.1s done
+#21 exporting manifest sha256:a3dc27bd886c1c45d75512d53e284852c4017ab9dd23da113df554162f7c2bb5 0.0s done
+#21 exporting config sha256:29ee77c7bb9cf11cbdba736de3f1ffc66371e50b18b43ef86c2bc3fc8e7282ea 0.0s done
+#21 exporting attestation manifest sha256:752dea54dea4828ce351519dac83cc552ed6a4dfa04cf2849965cc87ebbfc1f0 0.0s done
+#21 exporting manifest list sha256:49118b530606e494b235b8c7a7afe491a8a7b4da65a2415168dc352ae95a01f3 0.0s done
+#21 naming to docker.io/library/bike-demand:probe done
+#21 unpacking to docker.io/library/bike-demand:probe 0.1s done
+#21 DONE 0.4s
