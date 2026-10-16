@@ -130,3 +130,15 @@ personal data. Team evidence goes in `reports/lab-01.md` and
 Each weekly report is due Sunday 23:59 of the same week (published time zone).
 Assessment policy comes from the instructor, not this repository.
 See `BACKLOG.md` for later labs.
+
+## Lab 3: dependency lock
+
+`uv.lock` is the source of truth: install and run only with `--locked`
+(`uv sync --locked`, `uv run --locked ...`, and inside the Docker image).
+
+If `pyproject.toml` changes without `uv lock`, then `uv lock --check`, CI and
+`docker build` all fail. Fix it with `uv lock` in a reviewed PR that commits
+`pyproject.toml` and `uv.lock` together. Never use `--frozen` to get green: it
+skips the check.
+
+Evidence: `reports/lab3/logs/stale-lock.log`.
