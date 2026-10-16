@@ -9,3 +9,13 @@ WORKDIR /app
 # Lock first: this layer is reused until pyproject.toml or uv.lock change
 COPY pyproject.toml uv.lock .python-version ./
 RUN uv sync --locked --no-install-project
+
+# Data snapshot, config and code, then install the project from the lock
+COPY data ./data
+COPY configs ./configs
+COPY src ./src
+RUN uv sync --locked
+
+# Use the locked venv directly at run time
+ENV PATH="/app/.venv/bin:$PATH"
+CMD ["python", "-m", "bike_demand.train", "--config", "configs/baseline.yaml"]
