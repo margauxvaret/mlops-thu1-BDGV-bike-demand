@@ -1,6 +1,11 @@
 # Python 3.12, same as .python-version and requires-python
 FROM python:3.12-slim-trixie
 
+# tracking.training_commit() calls git: without it the baseline crashes
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
+
 # uv pinned to the CI version (pyproject requires >=0.12.19,<0.13)
 COPY --from=ghcr.io/astral-sh/uv:0.12.23 /uv /uvx /bin/
 
