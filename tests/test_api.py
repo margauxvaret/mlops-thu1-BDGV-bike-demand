@@ -1,4 +1,5 @@
 """Tests de l'API (Lab 4) : etat normal, entrees invalides, modele absent."""
+
 import hashlib
 import json
 import math
@@ -17,17 +18,36 @@ MODEL_DIR_ENV = "MODEL_DIR"
 TEST_VERSION = "test-0.0.1"
 
 FEATURES = [
-    "season", "yr", "mnth", "hr", "holiday", "weekday",
-    "workingday", "weathersit", "temp", "atemp", "hum", "windspeed",
+    "season",
+    "yr",
+    "mnth",
+    "hr",
+    "holiday",
+    "weekday",
+    "workingday",
+    "weathersit",
+    "temp",
+    "atemp",
+    "hum",
+    "windspeed",
 ]
 
 
 METADATA = {"model_version": TEST_VERSION, "features": FEATURES}
 
 VALID = {
-    "season": 1, "yr": 0, "mnth": 6, "hr": 12, "holiday": 0, "weekday": 3,
-    "workingday": 1, "weathersit": 1,
-    "temp": 0.5, "atemp": 0.5, "hum": 0.5, "windspeed": 0.2,
+    "season": 1,
+    "yr": 0,
+    "mnth": 6,
+    "hr": 12,
+    "holiday": 0,
+    "weekday": 3,
+    "workingday": 1,
+    "weathersit": 1,
+    "temp": 0.5,
+    "atemp": 0.5,
+    "hum": 0.5,
+    "windspeed": 0.2,
 }
 
 
@@ -49,7 +69,9 @@ def model_dir(tmp_path):
 @pytest.fixture
 def client(model_dir, monkeypatch):
     monkeypatch.setenv(MODEL_DIR_ENV, str(model_dir))
-    with TestClient(app, raise_server_exceptions=False) as c:  # execute le demarrage (lifespan)
+    with TestClient(
+        app, raise_server_exceptions=False
+    ) as c:  # execute le demarrage (lifespan)
         yield c
 
 
@@ -111,18 +133,27 @@ def test_wrong_type(client, field, value):
 @pytest.mark.parametrize(
     "field,value",
     [
-        ("season", 0), ("season", 5),
-        ("yr", -1), ("yr", 2),
-        ("mnth", 0), ("mnth", 13),
-        ("hr", -1), ("hr", 24),
+        ("season", 0),
+        ("season", 5),
+        ("yr", -1),
+        ("yr", 2),
+        ("mnth", 0),
+        ("mnth", 13),
+        ("hr", -1),
+        ("hr", 24),
         ("holiday", 2),
         ("weekday", 7),
         ("workingday", 2),
-        ("weathersit", 0), ("weathersit", 5),
-        ("temp", -0.1), ("temp", 1.1),
-        ("atemp", -0.1), ("atemp", 1.1),
-        ("hum", -0.1), ("hum", 1.1),
-        ("windspeed", -0.1), ("windspeed", 1.1),
+        ("weathersit", 0),
+        ("weathersit", 5),
+        ("temp", -0.1),
+        ("temp", 1.1),
+        ("atemp", -0.1),
+        ("atemp", 1.1),
+        ("hum", -0.1),
+        ("hum", 1.1),
+        ("windspeed", -0.1),
+        ("windspeed", 1.1),
     ],
 )
 def test_out_of_bounds(client, field, value):
@@ -131,7 +162,10 @@ def test_out_of_bounds(client, field, value):
 
 
 @pytest.mark.parametrize("field", ["temp", "atemp", "hum", "windspeed"])
-@pytest.mark.xfail(strict=True, reason="BUG: NaN/Infinity donne 500 au lieu de 422 (detail d'erreur non serialisable en JSON); signale a B")
+@pytest.mark.xfail(
+    strict=True,
+    reason="BUG: NaN/Infinity donne 500 au lieu de 422 (detail d'erreur non serialisable en JSON); signale a B",
+)
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
 def test_non_finite(client, field, value):
     assert post_raw(client, {**VALID, field: value}).status_code == 422
