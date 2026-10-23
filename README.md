@@ -143,11 +143,61 @@ skips the check.
 
 Evidence: `reports/lab3/logs/stale-lock.log`.
 
+## Lab 3: Build & rerun
+
+Same code, clean environment: the Lab 2 baseline runs from a Docker image built
+from the committed `uv.lock`, with no `.venv`, cache or secret from any laptop.
+
+### Prerequisites
+
+- On Windows, run the commands below in Git Bash. The repository currently tracks
+  both `DockerFile` and `Dockerfile`, which can collide on a case-insensitive
+  Windows checkout: for a reliable rerun, use a Linux/WSL checkout (see
+  "Lab 3: clean Docker rerun" below).
+
+### Build
+
+```bash
+git clone https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand.git
+cd mlops-thu1-BDGV-bike-demand
+git checkout <SHA>
+docker build --build-arg GIT_COMMIT=$(git rev-parse HEAD) -t bdgv-baseline:lab3 .
+```
+
+### Run the baseline and the tests
+
+```bash
+docker run --name lab3-run --network none bdgv-baseline:lab3
+docker run --rm --network none bdgv-baseline:lab3 uv run --locked pytest -q
+```
+
+### Collect the outputs and check the lock
+
+```bash
+mkdir -p ../evidence
+docker cp lab3-run:/app/artifacts ../evidence/artifacts
+docker cp lab3-run:/app/reports/metrics.json ../evidence/metrics.json
+docker rm lab3-run
+uv lock --check
+```
+
+### Expected results
+
+Same data snapshot, config and split as Lab 2: validation MAE (rentals/hour)
+should match the Lab 2 values in `reports/metrics.json`.
+
+| Predictor | Expected MAE |
+| --- | --- |
+| Train-mean comparator | 154.23 |
+| Random forest | 86.85 |
+- Any other failure: write down the failing step, the exact message and who
+  owns the next action.
+
 ### Lab 3: clean Docker rerun
 
 After the Lab 3 changes are merged, a teammate can rebuild and rerun the baseline
 from a fresh clone. Replace `<SHA>` with the reviewed integration commit to
-reproduce:
+reproduce.
 
 The repository currently contains both `DockerFile` and `Dockerfile`. On a
 case-insensitive Windows checkout, use a case-sensitive Linux/WSL checkout for
@@ -173,5 +223,5 @@ docker rm lab3-rerun
 ```
 
 The model file is retained with the rerun evidence, not committed; record its
-SHA-256 in the team report. The rerun logs and metrics are linked from the Lab 3
-Results section below.
+SHA-256 in the team report. The rerun logs and metrics are in
+`reports/lab3/logs/`.
