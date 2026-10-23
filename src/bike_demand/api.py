@@ -1,5 +1,6 @@
 """Prediction service: load the trusted saved model at startup; never train here."""
 
+import hashlib
 import json
 import logging
 import math
@@ -12,6 +13,7 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, Response
 
 from bike_demand.schemas import PredictRequest
+from bike_demand.validate import FEATURES
 
 logger = logging.getLogger(__name__)
 
@@ -29,10 +31,16 @@ def load_model(directory: Path) -> None:
     STATE.update(model=None, metadata=None, reason=None)
     try:
         metadata = json.loads((directory / "model-metadata.json").read_text())
+        model_path = directory / "model.joblib"
+        digest = hashlib.sha256(model_path.read_bytes()).hexdigest()
+        if digest != metadata["model_sha256"]:
+            raise ValueError("model.joblib does not match model_sha256 in the metadata")
+        if metadata["features"] != list(FEATURES):
+            raise ValueError("metadata features differ from the request contract")
         # joblib can run code from the file: only load our own, locally trained model.
-        model = joblib.load(directory / "model.joblib")
+        model = joblib.load(model_path)
     except Exception as error:
-        # Absent or unreadable model: the service still starts, without a model.
+        # Absent, unreadable or inconsistent model: the service still starts.
         STATE["reason"] = f"{type(error).__name__}: {error}"
         logger.warning("No usable model in %s (%s)", directory, STATE["reason"])
         return
