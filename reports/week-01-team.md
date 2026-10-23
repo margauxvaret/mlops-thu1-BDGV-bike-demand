@@ -101,6 +101,33 @@ _[Reviewer's observation on the pull request and the author's response. Leave bl
 - Lab 2 commits were first made on local `main` instead of `lab02/baseline`; they were moved to the task branch before the PR. _[confirm once done]_
 - Next: design and test Fault B, open the Lab 2 PR, get a review from another member, then re-run training on a clean tree and update the commit/run IDs above.
 
+## Lab 3 Results — clean container rerun
+
+The rerun used a fresh clone at integration commit `968306c8c7558d303dbffb94258071af27b579ed`.
+The committed `uv.lock` SHA-256 is `8d84120008104540172043b5dc103a83a3827f42dc8f0f369f0367e32e8c7462`.
+The image was built without cache from that commit and ran with `--network none`.
+Its image ID is `sha256:cd4f8f623ed434beb976be57eb36a2086f6f0f863cb67c84d66b6b65e0e0f0b0`
+(`linux/amd64`). The image label `org.opencontainers.image.revision` matches the
+commit above. The training metadata reports `training_commit: unavailable` because
+the image does not contain `.git`; the image label records the source revision.
+
+| Validation MAE (rentals/hour) | Lab 2 | Lab 3 | Écart (Lab 3 − Lab 2) | Explication |
+|---|---:|---:|---:|---|
+| Train-mean comparator | 154.231793 | 154.231793 | 0.000000 | Same train mean, unchanged data (`e03de4ee…`), features and validation rows. |
+| Random forest | 86.846857 | 86.846857 | 0.000000 | Same locked baseline configuration, seed, input snapshot and validation split; the observed validation MAE is unchanged. |
+
+The run held out July–December 2012 and did not calculate test-set metrics. The
+validation readback matched exactly (`reload_mae_delta: 0.0`). The rerun model
+SHA-256 is `d24c050e3631d5b4c2feb8cb571bef6382d8c975c42a5c11edd28de78a0b8c07`;
+the model binary is not committed.
+
+`uv run --locked pytest -q` in a second network-disabled container: **48 passed**
+with one SQLAlchemy deprecation warning emitted through MLflow. Run IDs, metrics,
+model hash, and raw evidence are in `reports/lab3/logs/metrics.json`,
+`reports/lab3/logs/run.log`, `reports/lab3/logs/tests.log`,
+`reports/lab3/logs/build.log`, `reports/lab3/logs/image.txt`, and
+`reports/lab3/logs/revision.txt`.
+
 ## Screenshots
 
 ![Lab 1: failing test before the fix (`pytest -m lab1`)](images/lab01-screenshot-1.png)
