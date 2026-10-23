@@ -1,0 +1,43 @@
+commit: 3c0d35a1834ff6774bf5071c2fb37946d9fbf7c7
+"model_version": "baseline-1f8963e78508"
+$ curl http://127.0.0.1:8000/health
+{"status":"ok","model_version":"baseline-1f8963e78508"}
+-> HTTP 200
+
+$ curl -X POST http://127.0.0.1:8000/predict -H  -d {"season":1,"yr":1,"mnth":3,"hr":8,"holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55,"windspeed":0.19}
+{"detail":[{"type":"model_attributes_type","loc":["body"],"msg":"Input should be a valid dictionary or object to extract fields from","input":"{\"season\":1,\"yr\":1,\"mnth\":3,\"hr\":8,\"holiday\":0,\"weekday\":2,\"workingday\":1,\"weathersit\":1,\"temp\":0.34,\"atemp\":0.33,\"hum\":0.55,\"windspeed\":0.19}"}]}
+-> HTTP 422
+
+## Missing field (no windspeed)
+$ curl -X POST http://127.0.0.1:8000/predict -H  -d {"season":1,"yr":1,"mnth":3,"hr":8,"holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55}
+{"detail":[{"type":"model_attributes_type","loc":["body"],"msg":"Input should be a valid dictionary or object to extract fields from","input":"{\"season\":1,\"yr\":1,\"mnth\":3,\"hr\":8,\"holiday\":0,\"weekday\":2,\"workingday\":1,\"weathersit\":1,\"temp\":0.34,\"atemp\":0.33,\"hum\":0.55}"}]}
+-> HTTP 422
+
+## Out of range (hr 24)
+$ curl -X POST http://127.0.0.1:8000/predict -H  -d {"season":1,"yr":1,"mnth":3,"hr":24,"holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55,"windspeed":0.19}
+{"detail":[{"type":"model_attributes_type","loc":["body"],"msg":"Input should be a valid dictionary or object to extract fields from","input":"{\"season\":1,\"yr\":1,\"mnth\":3,\"hr\":24,\"holiday\":0,\"weekday\":2,\"workingday\":1,\"weathersit\":1,\"temp\":0.34,\"atemp\":0.33,\"hum\":0.55,\"windspeed\":0.19}"}]}
+-> HTTP 422
+
+## Wrong type (hr as text)
+$ curl -X POST http://127.0.0.1:8000/predict -H  -d {"season":1,"yr":1,"mnth":3,"hr":"8","holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55,"windspeed":0.19}
+{"detail":[{"type":"model_attributes_type","loc":["body"],"msg":"Input should be a valid dictionary or object to extract fields from","input":"{\"season\":1,\"yr\":1,\"mnth\":3,\"hr\":\"8\",\"holiday\":0,\"weekday\":2,\"workingday\":1,\"weathersit\":1,\"temp\":0.34,\"atemp\":0.33,\"hum\":0.55,\"windspeed\":0.19}"}]}
+-> HTTP 422
+
+## Label as input (cnt)
+$ curl -X POST http://127.0.0.1:8000/predict -H  -d {"season":1,"yr":1,"mnth":3,"hr":8,"holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55,"windspeed":0.19,"cnt":5}
+{"detail":[{"type":"model_attributes_type","loc":["body"],"msg":"Input should be a valid dictionary or object to extract fields from","input":"{\"season\":1,\"yr\":1,\"mnth\":3,\"hr\":8,\"holiday\":0,\"weekday\":2,\"workingday\":1,\"weathersit\":1,\"temp\":0.34,\"atemp\":0.33,\"hum\":0.55,\"windspeed\":0.19,\"cnt\":5}"}]}
+-> HTTP 422
+
+## Model absent (MODEL_DIR=no-such-folder)
+$ curl http://127.0.0.1:8000/health
+{"status":"unavailable","reason":"FileNotFoundError: [Errno 2] No such file or directory: 'no-such-folder\\\\model-metadata.json'"}
+-> HTTP 503
+
+$ curl -X POST http://127.0.0.1:8000/predict -H  -d {"season":1,"yr":1,"mnth":3,"hr":8,"holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55,"windspeed":0.19}
+{"detail":[{"type":"model_attributes_type","loc":["body"],"msg":"Input should be a valid dictionary or object to extract fields from","input":"{\"season\":1,\"yr\":1,\"mnth\":3,\"hr\":8,\"holiday\":0,\"weekday\":2,\"workingday\":1,\"weathersit\":1,\"temp\":0.34,\"atemp\":0.33,\"hum\":0.55,\"windspeed\":0.19}"}]}
+-> HTTP 422
+
+$ curl -X POST http://127.0.0.1:8000/predict -H  -d {"season":1}
+{"detail":[{"type":"model_attributes_type","loc":["body"],"msg":"Input should be a valid dictionary or object to extract fields from","input":"{\"season\":1}"}]}
+-> HTTP 422
+
