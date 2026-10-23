@@ -150,11 +150,10 @@ from the committed `uv.lock`, with no `.venv`, cache or secret from any laptop.
 
 ### Prerequisites
 
-- Docker (Docker Desktop on Windows/macOS), checked with Docker 29.x:
-  `docker --version`.
-- Git, to clone the repository and get the commit SHA.
-- Optional: uv `>=0.12.19,<0.13`, only to run `uv lock --check` on the host.
-- On Windows, run the commands below in Git Bash.
+- On Windows, run the commands below in Git Bash. The repository currently tracks
+  both `DockerFile` and `Dockerfile`, which can collide on a case-insensitive
+  Windows checkout: for a reliable rerun, use a Linux/WSL checkout (see
+  "Lab 3: clean Docker rerun" below).
 
 ### Build
 
@@ -191,20 +190,14 @@ should match the Lab 2 values in `reports/metrics.json`.
 | --- | --- |
 | Train-mean comparator | 154.23 |
 | Random forest | 86.85 |
-
-### If something fails
-
-- `docker build` stops at `uv sync --locked`: the lock is stale. Never
-  regenerate it just to get green; see "Lab 3: dependency lock".
-- The MAE differ from Lab 2: do not tune anything. Record the observed values
-  and explain the gap in the team report.
 - Any other failure: write down the failing step, the exact message and who
   owns the next action.
+
 ### Lab 3: clean Docker rerun
 
 After the Lab 3 changes are merged, a teammate can rebuild and rerun the baseline
 from a fresh clone. Replace `<SHA>` with the reviewed integration commit to
-reproduce:
+reproduce.
 
 The repository currently contains both `DockerFile` and `Dockerfile`. On a
 case-insensitive Windows checkout, use a case-sensitive Linux/WSL checkout for
@@ -230,5 +223,5 @@ docker rm lab3-rerun
 ```
 
 The model file is retained with the rerun evidence, not committed; record its
-SHA-256 in the team report. The rerun logs and metrics are linked from the Lab 3
-Results section below.
+SHA-256 in the team report. The rerun logs and metrics are in
+`reports/lab3/logs/`.
