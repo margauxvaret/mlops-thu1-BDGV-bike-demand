@@ -1,0 +1,42 @@
+=== DEBUT TEST DE VALIDATION PYDANTIC ===
+
+--- Scenario: 01_valide ---
+RESULTAT : ACCEPTÉ (200 OK)
+
+--- Scenario: 02_manquant_temp ---
+RESULTAT : REFUSÉ (422 Unprocessable Entity)
+Détail : Field required (sur le champ 'temp')
+
+--- Scenario: 03_mauvais_type_string ---
+RESULTAT : REFUSÉ (422 Unprocessable Entity)
+Détail : Input should be a valid integer (sur le champ 'hr')
+
+--- Scenario: 04_hors_borne_season ---
+RESULTAT : REFUSÉ (422 Unprocessable Entity)
+Détail : Input should be less than or equal to 4 (sur le champ 'season')
+
+--- Scenario: 05_hors_borne_hr ---
+RESULTAT : REFUSÉ (422 Unprocessable Entity)
+Détail : Input should be less than or equal to 23 (sur le champ 'hr')
+
+--- Scenario: 06_hors_borne_temp ---
+RESULTAT : REFUSÉ (422 Unprocessable Entity)
+Détail : Input should be less than or equal to 1 (sur le champ 'temp')
+
+--- Scenario: 07_nan_refuse ---
+RESULTAT : REFUSÉ (422 Unprocessable Entity)
+Détail : Input should be a finite number (sur le champ 'temp')
+
+--- Scenario: 08_inf_refuse ---
+RESULTAT : REFUSÉ (422 Unprocessable Entity)
+Détail : Input should be a finite number (sur le champ 'temp')
+
+--- Scenario: 09_champ_cnt_interdit ---
+RESULTAT : REFUSÉ (422 Unprocessable Entity)
+Détail : Extra inputs are not permitted (sur le champ 'cnt')
+
+--- Scenario: 10_champ_inconnu ---
+RESULTAT : REFUSÉ (422 Unprocessable Entity)
+Détail : Extra inputs are not permitted (sur le champ 'champ_inconnu')
+
+=== FIN TEST DE VALIDATION ===
