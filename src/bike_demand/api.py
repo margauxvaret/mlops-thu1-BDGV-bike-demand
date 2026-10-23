@@ -2,12 +2,16 @@
 
 import json
 import logging
+import math
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 import joblib
-from fastapi import FastAPI, Response
+import pandas as pd
+from fastapi import FastAPI, HTTPException, Response
+
+from bike_demand.schemas import PredictRequest
 
 logger = logging.getLogger(__name__)
 
@@ -51,3 +55,20 @@ def health(response: Response) -> dict:
         response.status_code = 503
         return {"status": "unavailable", "reason": STATE["reason"]}
     return {"status": "ok", "model_version": STATE["metadata"]["model_version"]}
+
+
+@app.post("/predict")
+def predict(request: PredictRequest) -> dict:
+    # Invalid input never reaches this line: FastAPI answers 422 first.
+    model, metadata = STATE["model"], STATE["metadata"]
+    if model is None:
+        raise HTTPException(status_code=503, detail="no usable model loaded")
+    features = metadata["features"]
+    values = request.model_dump()
+    row = pd.DataFrame([[values[name] for name in features]], columns=features)
+    prediction = float(model.predict(row)[0])
+    if not math.isfinite(prediction) or prediction < 0:
+        raise HTTPException(
+            status_code=500, detail="model returned an invalid prediction"
+        )
+    return {"prediction": prediction, "model_version": metadata["model_version"]}
