@@ -111,6 +111,12 @@ Its image ID is `sha256:cd4f8f623ed434beb976be57eb36a2086f6f0f863cb67c84d66b6b65
 commit above. The training metadata reports `training_commit: unavailable` because
 the image does not contain `.git`; the image label records the source revision.
 
+The repo tracks both `DockerFile` and `Dockerfile`. This Windows checkout is
+case-insensitive and Git showed a local `M DockerFile` after checkout. To keep
+the source unchanged while preserving both names, the build context was streamed
+from `git archive` of the exact commit into Docker. No Dockerfile change is part
+of this branch. Use a case-sensitive Linux/WSL checkout for the README procedure.
+
 | Validation MAE (rentals/hour) | Lab 2 | Lab 3 | Écart (Lab 3 − Lab 2) | Explication |
 |---|---:|---:|---:|---|
 | Train-mean comparator | 154.231793 | 154.231793 | 0.000000 | Same train mean, unchanged data (`e03de4ee…`), features and validation rows. |

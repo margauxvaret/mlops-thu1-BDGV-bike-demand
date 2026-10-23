@@ -1,3 +1,4 @@
+# Source context: git archive --format=tar 968306c8c7558d303dbffb94258071af27b579ed | docker build --no-cache --progress=plain --build-arg GIT_COMMIT=968306c8c7558d303dbffb94258071af27b579ed -t bdgv-baseline:lab3 -
 #0 building with "desktop-linux" instance using docker driver
 
 #1 [internal] load remote build context

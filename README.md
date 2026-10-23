@@ -149,6 +149,10 @@ After the Lab 3 changes are merged, a teammate can rebuild and rerun the baselin
 from a fresh clone. Replace `<SHA>` with the reviewed integration commit to
 reproduce:
 
+The repository currently contains both `DockerFile` and `Dockerfile`. On a
+case-insensitive Windows checkout, use a case-sensitive Linux/WSL checkout for
+this procedure so Git can materialize both tracked paths independently.
+
 ```sh
 git clone <url-team-repo> lab3-rerun
 cd lab3-rerun
