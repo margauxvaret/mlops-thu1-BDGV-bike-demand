@@ -29,3 +29,16 @@ $ curl -X POST http://127.0.0.1:8000/predict -H Content-Type: application/json -
 {"detail":[{"type":"extra_forbidden","loc":["body","cnt"],"msg":"Extra inputs are not permitted","input":5}]}
 -> HTTP 422
 
+## Model absent (MODEL_DIR=no-such-folder)
+$ curl http://127.0.0.1:8000/health
+{"status":"unavailable","reason":"FileNotFoundError: [Errno 2] No such file or directory: 'no-such-folder\\\\model-metadata.json'"}
+-> HTTP 503
+
+$ curl -X POST http://127.0.0.1:8000/predict -H Content-Type: application/json -d {"season":1,"yr":1,"mnth":3,"hr":8,"holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55,"windspeed":0.19}
+{"detail":"no usable model loaded"}
+-> HTTP 503
+
+$ curl -X POST http://127.0.0.1:8000/predict -H Content-Type: application/json -d {"season":1}
+{"detail":[{"type":"missing","loc":["body","yr"],"msg":"Field required","input":{"season":1}},{"type":"missing","loc":["body","mnth"],"msg":"Field required","input":{"season":1}},{"type":"missing","loc":["body","hr"],"msg":"Field required","input":{"season":1}},{"type":"missing","loc":["body","holiday"],"msg":"Field required","input":{"season":1}},{"type":"missing","loc":["body","weekday"],"msg":"Field required","input":{"season":1}},{"type":"missing","loc":["body","workingday"],"msg":"Field required","input":{"season":1}},{"type":"missing","loc":["body","weathersit"],"msg":"Field required","input":{"season":1}},{"type":"missing","loc":["body","temp"],"msg":"Field required","input":{"season":1}},{"type":"missing","loc":["body","atemp"],"msg":"Field required","input":{"season":1}},{"type":"missing","loc":["body","hum"],"msg":"Field required","input":{"season":1}},{"type":"missing","loc":["body","windspeed"],"msg":"Field required","input":{"season":1}}]}
+-> HTTP 422
+
