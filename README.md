@@ -142,3 +142,36 @@ If `pyproject.toml` changes without `uv lock`, then `uv lock --check`, CI and
 skips the check.
 
 Evidence: `reports/lab3/logs/stale-lock.log`.
+
+### Lab 3: clean Docker rerun
+
+After the Lab 3 changes are merged, a teammate can rebuild and rerun the baseline
+from a fresh clone. Replace `<SHA>` with the reviewed integration commit to
+reproduce:
+
+The repository currently contains both `DockerFile` and `Dockerfile`. On a
+case-insensitive Windows checkout, use a case-sensitive Linux/WSL checkout for
+this procedure so Git can materialize both tracked paths independently.
+
+```sh
+git clone <url-team-repo> lab3-rerun
+cd lab3-rerun
+git checkout <SHA>
+mkdir -p ../evidence
+{ git rev-parse HEAD; sha256sum uv.lock; } | tee ../evidence/revision.txt
+docker build --no-cache --progress=plain \
+  --build-arg GIT_COMMIT="$(git rev-parse HEAD)" \
+  -t bdgv-baseline:lab3 . 2>&1 | tee ../evidence/build.log
+docker image inspect bdgv-baseline:lab3 \
+  --format '{{.Id}} {{.Os}}/{{.Architecture}}' | tee ../evidence/image.txt
+docker run --name lab3-rerun --network none bdgv-baseline:lab3 \
+  2>&1 | tee ../evidence/run.log
+docker run --rm --network none bdgv-baseline:lab3 \
+  uv run --locked pytest -q 2>&1 | tee ../evidence/tests.log
+docker cp lab3-rerun:/app/artifacts ../evidence/artifacts
+docker rm lab3-rerun
+```
+
+The model file is retained with the rerun evidence, not committed; record its
+SHA-256 in the team report. The rerun logs and metrics are linked from the Lab 3
+Results section below.
