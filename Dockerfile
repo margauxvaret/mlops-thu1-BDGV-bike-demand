@@ -36,8 +36,17 @@ COPY tests ./tests
 # Use the locked venv directly at run time
 ENV PATH="/app/.venv/bin:$PATH"
 
+# Cloud Run: port sur laquelle le conteneur doit écouter (doit correspondre au "Port du conteneur" = 8000)
+ENV PORT=8000
+EXPOSE 8000
+
 # Link the image to the commit it was built from
 ARG GIT_COMMIT=unknown
 LABEL org.opencontainers.image.revision=$GIT_COMMIT
 
+# ATTENTION : Cloud Run (service) exige un process qui ÉCOUTE en HTTP sur $PORT.
+# Le CMD actuel lance un entraînement qui se termine -> "failed to start and listen on the port".
 CMD ["python", "-m", "bike_demand.train", "--config", "configs/baseline.yaml"]
+
+# Pour un service Cloud Run, remplace le CMD ci-dessus par un serveur HTTP, par exemple (à adapter à ton module) :
+# CMD ["sh", "-c", "uvicorn bike_demand.api:app --host 0.0.0.0 --port ${PORT}"]
