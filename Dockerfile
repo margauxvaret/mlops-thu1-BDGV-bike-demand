@@ -36,13 +36,17 @@ COPY tests ./tests
 # Use the locked venv directly at run time
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Cloud Run: port sur laquelle le conteneur doit écouter (= "Port du conteneur" = 8000)
+# Port the service listens on inside the container (publish it with docker run -p)
 ENV PORT=8000
 EXPOSE 8000
 
-# Link the image to the commit it was built from
-ARG GIT_COMMIT=unknown
-LABEL org.opencontainers.image.revision=$GIT_COMMIT
+# Run-time settings: override any of them with docker run -e NAME=value
+ENV MODEL_DIR=/models \
+    LOG_LEVEL=info
 
-# Cloud Run (service) exige un process qui écoute en HTTP sur $PORT
+# Link the image to the commit it was built from (docker build --build-arg GIT_SHA=...)
+ARG GIT_SHA=unknown
+ENV GIT_SHA=$GIT_SHA
+LABEL org.opencontainers.image.revision=$GIT_SHA
+
 CMD ["sh", "-c", "uvicorn bike_demand.api:app --host 0.0.0.0 --port ${PORT}"]
