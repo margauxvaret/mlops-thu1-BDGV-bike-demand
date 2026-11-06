@@ -12,10 +12,13 @@ import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Response
 
+from bike_demand.request_logging import (
+    configure_logging,
+    install_request_logging,
+    log_event,
+)
 from bike_demand.schemas import PredictRequest
 from bike_demand.validate import FEATURES
-
-logger = logging.getLogger(__name__)
 
 # The single model-availability state, read by every route.
 STATE: dict = {
@@ -36,6 +39,12 @@ def model_dir() -> Path:
     return Path(os.environ.get("MODEL_DIR", "artifacts"))
 
 
+def current_model_version() -> str | None:
+    """Version of the loaded model, None when no model is loaded (used in logs)."""
+    metadata = STATE["metadata"]
+    return metadata["model_version"] if metadata else None
+
+
 def load_model(directory: Path) -> None:
     """Fill STATE from directory; on any problem keep serving, without a model."""
     STATE.update(model=None, metadata=None, sha256=None, reason=None)
@@ -52,9 +61,22 @@ def load_model(directory: Path) -> None:
     except Exception as error:
         # Absent, unreadable or inconsistent model: the service still starts.
         STATE["reason"] = f"{type(error).__name__}: {error}"
-        logger.warning("No usable model in %s (%s)", directory, STATE["reason"])
+        log_event(
+            "model_missing",
+            logging.WARNING,
+            model_dir=str(directory),
+            reason=STATE["reason"],
+            git_sha=git_sha(),
+        )
         return
     STATE.update(model=model, metadata=metadata, sha256=digest)
+    log_event(
+        "model_loaded",
+        model_dir=str(directory),
+        model_version=metadata["model_version"],
+        model_sha256=digest,
+        git_sha=git_sha(),
+    )
 
 
 @asynccontextmanager
@@ -64,6 +86,8 @@ async def lifespan(app: FastAPI):
     STATE.update(model=None, metadata=None, sha256=None, reason="service stopped")
 
 
+# JSON log lines on stdout (level from LOG_LEVEL); read them with docker logs.
+configure_logging()
 app = FastAPI(title="Bike demand prediction", lifespan=lifespan)
 
 
@@ -100,3 +124,7 @@ def predict(request: PredictRequest) -> dict:
             status_code=500, detail="model returned an invalid prediction"
         )
     return {"prediction": prediction, "model_version": metadata["model_version"]}
+
+
+# One structured log line per request (Lab 5). Keep this after the routes.
+install_request_logging(app, get_model_version=current_model_version)

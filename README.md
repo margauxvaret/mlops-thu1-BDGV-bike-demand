@@ -225,3 +225,67 @@ docker rm lab3-rerun
 The model file is retained with the rerun evidence, not committed; record its
 SHA-256 in the team report. The rerun logs and metrics are in
 `reports/lab3/logs/`.
+
+# Lab 5: 
+
+### Logs (Gabrielle)
+
+The service writes **one JSON line per request** to stdout, plus one line at
+start-up saying whether the model loaded. Read them from outside the container:
+
+```bash
+docker logs <container>
+docker logs --since 5m <container>
+docker logs <container> > reports/evidence/lab5/<git-sha>.jsonl  
+```
+
+Set the level with `-e LOG_LEVEL=DEBUG|INFO|WARNING` (default `INFO`). An unknown
+level stops the service at start-up instead of silently logging nothing.
+Uvicorn's own access log is turned off (`--no-access-log` in the Dockerfile `CMD`)
+so a request never writes two lines.
+
+| Field | Meaning |
+| --- | --- |
+| `event` | `served` (2xx), `rejected` (4xx), `unavailable` (503), `failed` (500); at start-up `model_loaded` or `model_missing` |
+| `request_id` | Request id, also returned in the `X-Request-ID` response header. A client may send its own (letters, digits, `.` `_` `-`, max 64), otherwise one is generated |
+| `method`, `path` | HTTP method and route, without the query string |
+| `status` | HTTP status returned |
+| `ms` | Time spent in the service, in milliseconds |
+| `model_version` | Version of the loaded model; `null` when no model is loaded |
+| `invalid_fields` | Rejected input only: `field:reason`, e.g. `hr:less_than_equal`, `cnt:extra_forbidden` |
+| `error`, `error_at` | Crash only: exception class and `file:line` where it was raised |
+
+The start-up line `model_loaded` also carries `model_dir`, `model_sha256` and
+`git_sha`, so the logs alone tell which model file and which code revision were
+running. `model_missing` carries `model_dir`, `git_sha` and the `reason` the
+model could not be used (missing file, SHA256 mismatch, different features).
+
+#### Log line: what must one request tell an operator?
+
+- **Our choice:** what happened (`event`, `status`), to which request
+  (`request_id`, `method`, `path`), how long it took (`ms`) and which model
+  answered (`model_version`). A rejected request also says which fields were
+  wrong and why, without their values.
+- **Rejected option:** keep Uvicorn's default access line
+  (`"POST /predict HTTP/1.1" 422`).
+- **Why:** it says neither which model answered nor why a request was refused,
+  it is plain text that is hard to filter, and it contains the client's IP
+  address. With `request_id` echoed in the response header, the check script can
+  send a known id and find its exact line in `docker logs`.
+
+#### Secrets: what must never appear in a log?
+
+- **Our choice:** no request or response bodies (input values, predictions), no
+  headers (they can carry tokens or cookies), no query strings, no client IP
+  addresses (personal data), no environment variables, no exception messages
+  while handling a request. For invalid input we log only the field name and the
+  error type; for a crash only the exception class and `file:line`. The one
+  message we do log is the start-up `reason` a model could not be loaded: it is
+  about our own files in `MODEL_DIR`, never about what a client sent.
+- **Rejected option:** log the full request body of rejected requests, or the
+  full traceback, which would make debugging faster.
+- **Why:** a log is copied, shipped and read by more people than the service
+  itself; anything a client sends may one day be personal or secret, and an
+  exception message can quote it. Field name + reason is enough to diagnose a
+  422; `error_at` points to the line to read for a 500. Unit tests check that a
+  submitted value and an exception message never reach the log.

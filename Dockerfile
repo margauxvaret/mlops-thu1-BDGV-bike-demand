@@ -49,4 +49,6 @@ ARG GIT_SHA=unknown
 ENV GIT_SHA=$GIT_SHA
 LABEL org.opencontainers.image.revision=$GIT_SHA
 
-CMD ["sh", "-c", "uvicorn bike_demand.api:app --host 0.0.0.0 --port ${PORT}"]
+# The service logs one JSON line per request itself (bike_demand.request_logging):
+# Uvicorn's access log is off so a request never writes two lines or a client IP.
+CMD ["sh", "-c", "uvicorn bike_demand.api:app --host 0.0.0.0 --port ${PORT} --no-access-log"]

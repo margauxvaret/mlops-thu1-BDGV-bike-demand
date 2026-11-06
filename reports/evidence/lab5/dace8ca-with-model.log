@@ -1,0 +1,8 @@
+INFO:     Started server process [7]
+INFO:     Waiting for application startup.
+{"ts": "2026-11-06T16:49:39.588+00:00", "level": "INFO", "event": "model_loaded", "model_dir": "/models", "model_version": "baseline-1f8963e78508", "model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304", "git_sha": "dace8caaca5a68bcf6c63f43d1394810bfa70e56"}
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+{"ts": "2026-11-06T16:50:41.418+00:00", "level": "INFO", "event": "served", "request_id": "lab5-health", "method": "GET", "path": "/health", "status": 200, "ms": 1.9, "model_version": "baseline-1f8963e78508"}
+{"ts": "2026-11-06T16:50:48.017+00:00", "level": "INFO", "event": "served", "request_id": "lab5-valid", "method": "POST", "path": "/predict", "status": 200, "ms": 97.2, "model_version": "baseline-1f8963e78508"}
+{"ts": "2026-11-06T16:52:03.007+00:00", "level": "INFO", "event": "rejected", "request_id": "lab5-invalid", "method": "POST", "path": "/predict", "status": 422, "ms": 0.7, "model_version": "baseline-1f8963e78508", "invalid_fields": ["hr:less_than_equal"]}
