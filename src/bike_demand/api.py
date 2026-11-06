@@ -18,7 +18,17 @@ from bike_demand.validate import FEATURES
 logger = logging.getLogger(__name__)
 
 # The single model-availability state, read by every route.
-STATE: dict = {"model": None, "metadata": None, "reason": "not loaded yet"}
+STATE: dict = {
+    "model": None,
+    "metadata": None,
+    "sha256": None,
+    "reason": "not loaded yet",
+}
+
+
+def git_sha() -> str:
+    """Commit the image was built from (injected with --build-arg GIT_SHA)."""
+    return os.environ.get("GIT_SHA", "unknown")
 
 
 def model_dir() -> Path:
@@ -28,7 +38,7 @@ def model_dir() -> Path:
 
 def load_model(directory: Path) -> None:
     """Fill STATE from directory; on any problem keep serving, without a model."""
-    STATE.update(model=None, metadata=None, reason=None)
+    STATE.update(model=None, metadata=None, sha256=None, reason=None)
     try:
         metadata = json.loads((directory / "model-metadata.json").read_text())
         model_path = directory / "model.joblib"
@@ -44,14 +54,14 @@ def load_model(directory: Path) -> None:
         STATE["reason"] = f"{type(error).__name__}: {error}"
         logger.warning("No usable model in %s (%s)", directory, STATE["reason"])
         return
-    STATE.update(model=model, metadata=metadata)
+    STATE.update(model=model, metadata=metadata, sha256=digest)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_model(model_dir())
     yield
-    STATE.update(model=None, metadata=None, reason="service stopped")
+    STATE.update(model=None, metadata=None, sha256=None, reason="service stopped")
 
 
 app = FastAPI(title="Bike demand prediction", lifespan=lifespan)
@@ -61,8 +71,18 @@ app = FastAPI(title="Bike demand prediction", lifespan=lifespan)
 def health(response: Response) -> dict:
     if STATE["model"] is None:
         response.status_code = 503
-        return {"status": "unavailable", "reason": STATE["reason"]}
-    return {"status": "ok", "model_version": STATE["metadata"]["model_version"]}
+        return {
+            "status": "unavailable",
+            "reason": STATE["reason"],
+            "message": "No model loaded: mount the model folder (MODEL_DIR)",
+            "git_sha": git_sha(),
+        }
+    return {
+        "status": "ok",
+        "model_version": STATE["metadata"]["model_version"],
+        "model_sha256": STATE["sha256"],
+        "git_sha": git_sha(),
+    }
 
 
 @app.post("/predict")
