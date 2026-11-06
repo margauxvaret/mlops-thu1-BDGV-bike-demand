@@ -1,0 +1,7 @@
+INFO:     Started server process [7]
+INFO:     Waiting for application startup.
+{"ts": "2026-11-06T16:52:42.555+00:00", "level": "WARNING", "event": "model_missing", "model_dir": "/models", "reason": "FileNotFoundError: [Errno 2] No such file or directory: '/models/model-metadata.json'", "git_sha": "dace8caaca5a68bcf6c63f43d1394810bfa70e56"}
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+{"ts": "2026-11-06T16:52:45.721+00:00", "level": "WARNING", "event": "unavailable", "request_id": "lab5-nomodel-health", "method": "GET", "path": "/health", "status": 503, "ms": 1.7, "model_version": null}
+{"ts": "2026-11-06T16:52:45.921+00:00", "level": "WARNING", "event": "unavailable", "request_id": "lab5-nomodel-predict", "method": "POST", "path": "/predict", "status": 503, "ms": 1.2, "model_version": null}
