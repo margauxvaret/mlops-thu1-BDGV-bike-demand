@@ -49,4 +49,4 @@ LABEL org.opencontainers.image.revision=$GIT_COMMIT
 CMD ["python", "-m", "bike_demand.train", "--config", "configs/baseline.yaml"]
 
 # Pour un service Cloud Run, remplace le CMD ci-dessus par un serveur HTTP, par exemple (à adapter à ton module) :
-# CMD ["sh", "-c", "uvicorn bike_demand.api:app --host 0.0.0.0 --port ${PORT}"]
+CMD ["sh", "-c", "uvicorn bike_demand.api:app --host 0.0.0.0 --port ${PORT}"]
