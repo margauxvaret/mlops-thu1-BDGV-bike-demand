@@ -1,0 +1,8 @@
+HTTP/1.1 503 Service Unavailable
+date: Sun, 08 Nov 2026 21:42:47 GMT
+server: uvicorn
+content-length: 238
+content-type: application/json
+x-request-id: ecd2a5048012
+
+{"status":"unavailable","reason":"FileNotFoundError: [Errno 2] No such file or directory: '/models/model-metadata.json'","message":"No model loaded: mount the model folder (MODEL_DIR)","git_sha":"e0c3bb98de3629f2d56d59715bb8afb3c1bd4ca4"}

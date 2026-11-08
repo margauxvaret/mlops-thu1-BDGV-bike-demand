@@ -1,0 +1,1 @@
+Port 8000 was already occupied by a local Python process (PID 5012); the test used host port 8001 mapped to container port 8000. The existing process was left running.
