@@ -289,3 +289,139 @@ model could not be used (missing file, SHA256 mismatch, different features).
   exception message can quote it. Field name + reason is enough to diagnose a
   422; `error_at` points to the line to read for a 500. Unit tests check that a
   submitted value and an exception message never reach the log.
+
+## Lab 4: API container and deployment (Person D)
+
+### Model delivery decision
+
+We supply the trained model with a **read-only bind mount at run time**. The image contains the API and its locked Python dependencies, not a model binary. `MODEL_DIR` still defaults to `artifacts/` in the application; the container command explicitly sets it to `/models` to match the mount.
+
+- **Chosen:** mount `artifacts/` at `/models` with read-only access and pass `MODEL_DIR=/models`.
+- **Rejected — train during image build:** every build would execute training, take longer, and make an image build depend on training inputs and behavior.
+- **Rejected — commit the model:** the binary would be coupled to source changes, enlarge Git history, and make artifact replacement harder to review.
+
+The service never trains at startup. Without a model, it stays up and returns `503` for `/health` and for a valid `/predict` request.
+
+### Build the image
+
+From the repository root, on the reviewed commit that contains the API routes and request schema:
+
+```bash
+set -o pipefail
+mkdir -p reports/lab4/logs
+docker build --no-cache --progress=plain -f Dockerfile \
+  --build-arg GIT_SHA="$(git rev-parse HEAD)" \
+  -t bdgv-api:lab4 . 2>&1 | tee reports/lab4/logs/docker-build.log
+docker image inspect bdgv-api:lab4 \
+  --format '{{.Id}} {{.Os}}/{{.Architecture}}' \
+  | tee reports/lab4/logs/image.txt
+```
+
+PowerShell equivalent:
+
+```powershell
+New-Item -ItemType Directory -Force .\reports\lab4\logs | Out-Null
+$commit = (git rev-parse HEAD).Trim()
+docker build --no-cache --progress=plain -f Dockerfile `
+  --build-arg "GIT_SHA=$commit" -t bdgv-api:lab4 . 2>&1 `
+  | Tee-Object .\reports\lab4\logs\docker-build.log
+if ($LASTEXITCODE -ne 0) { throw "Docker build failed: $LASTEXITCODE" }
+docker image inspect bdgv-api:lab4 `
+  --format '{{.Id}} {{.Os}}/{{.Architecture}}' `
+  | Tee-Object .\reports\lab4\logs\image.txt
+```
+
+### Run with the model mounted
+
+The local `artifacts/` directory must already contain `model.joblib` and `model-metadata.json`. Do not retrain for this deployment exercise. If those files are not available yet, do not invent or retrain an artifact: build the image and run the no-model check below, then request the existing Lab 4 artifact from the teammate who trained it before attempting the successful prediction check.
+
+```bash
+docker rm -f bdgv-api-lab4 2>/dev/null || true
+docker run -d --name bdgv-api-lab4 \
+  -p 127.0.0.1:8000:8000 \
+  -e MODEL_DIR=/models \
+  --mount type=bind,source="$(pwd)/artifacts",target=/models,readonly \
+  bdgv-api:lab4
+```
+
+PowerShell:
+
+```powershell
+$ModelPath = (Resolve-Path .\artifacts).Path
+docker rm -f bdgv-api-lab4 2>$null
+docker run -d --name bdgv-api-lab4 `
+  -p 127.0.0.1:8000:8000 -e MODEL_DIR=/models `
+  --mount "type=bind,source=$ModelPath,target=/models,readonly" `
+  bdgv-api:lab4
+```
+
+Send requests from outside the container and preserve the observed status and body:
+
+```bash
+curl -sS -i http://127.0.0.1:8000/health \
+  | tee reports/lab4/logs/health-with-model.log
+VALID='{"season":1,"yr":1,"mnth":3,"hr":8,"holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55,"windspeed":0.19}'
+curl -sS -i -H 'Content-Type: application/json' \
+  -d "$VALID" http://127.0.0.1:8000/predict \
+  | tee reports/lab4/logs/predict-with-model.log
+curl -sS -i -H 'Content-Type: application/json' \
+  -d '{"season":1,"yr":1,"mnth":3,"hr":24,"holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55,"windspeed":0.19}' \
+  http://127.0.0.1:8000/predict \
+  | tee reports/lab4/logs/predict-invalid.log
+docker logs bdgv-api-lab4 2>&1 | tee reports/lab4/logs/container-with-model.log
+```
+
+Expected: `/health` and valid `/predict` return `200`; the prediction response has `prediction` and `model_version`; `hr=24` returns `422`. The API test suite also checks that `cnt`, `casual`, `registered`, and unknown fields return `422`.
+
+### Deliberate no-model check
+
+Stop the mounted-model container, then start the same image with no volume. This proves the service reports missing-model status instead of training or crashing:
+
+```bash
+docker rm -f bdgv-api-lab4
+docker run -d --name bdgv-api-lab4 -p 127.0.0.1:8000:8000 \
+  -e MODEL_DIR=/models bdgv-api:lab4
+curl -sS -i http://127.0.0.1:8000/health \
+  | tee reports/lab4/logs/health-no-model.log
+curl -sS -i -H 'Content-Type: application/json' -d "$VALID" \
+  http://127.0.0.1:8000/predict \
+  | tee reports/lab4/logs/predict-no-model.log
+docker logs bdgv-api-lab4 2>&1 | tee reports/lab4/logs/container-no-model.log
+docker rm -f bdgv-api-lab4
+```
+
+Expected: `/health` and a **valid** `/predict` request return `503`; invalid input still returns `422`. Keep the raw build output, image ID, HTTP responses, and container logs under `reports/lab4/logs/`. Do not commit the model binary.
+
+PowerShell request checks:
+
+```powershell
+$valid = '{"season":1,"yr":1,"mnth":3,"hr":8,"holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55,"windspeed":0.19}'
+curl.exe -sS -i http://127.0.0.1:8000/health `
+  | Tee-Object .\reports\lab4\logs\health-with-model.log
+curl.exe -sS -i -H "Content-Type: application/json" `
+  --data-raw $valid http://127.0.0.1:8000/predict `
+  | Tee-Object .\reports\lab4\logs\predict-with-model.log
+$invalid = '{"season":1,"yr":1,"mnth":3,"hr":24,"holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55,"windspeed":0.19}'
+curl.exe -sS -i -H "Content-Type: application/json" `
+  --data-raw $invalid http://127.0.0.1:8000/predict `
+  | Tee-Object .\reports\lab4\logs\predict-invalid.log
+docker logs bdgv-api-lab4 2>&1 `
+  | Tee-Object .\reports\lab4\logs\container-with-model.log
+```
+
+PowerShell no-model check:
+
+```powershell
+docker rm -f bdgv-api-lab4 2>$null
+docker run -d --name bdgv-api-lab4 `
+  -p 127.0.0.1:8000:8000 -e MODEL_DIR=/models bdgv-api:lab4
+curl.exe -sS -i http://127.0.0.1:8000/health `
+  | Tee-Object .\reports\lab4\logs\health-no-model.log
+$valid = '{"season":1,"yr":1,"mnth":3,"hr":8,"holiday":0,"weekday":2,"workingday":1,"weathersit":1,"temp":0.34,"atemp":0.33,"hum":0.55,"windspeed":0.19}'
+curl.exe -sS -i -H "Content-Type: application/json" `
+  --data-raw $valid http://127.0.0.1:8000/predict `
+  | Tee-Object .\reports\lab4\logs\predict-no-model.log
+docker logs bdgv-api-lab4 2>&1 `
+  | Tee-Object .\reports\lab4\logs\container-no-model.log
+docker rm -f bdgv-api-lab4
+```
