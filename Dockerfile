@@ -41,6 +41,8 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Run-time settings: override any of them with docker run -e NAME=value
+# Lab 4 decision: provide the pre-existing model as a read-only runtime volume;
+# the image does not train or bake the model.
 ENV MODEL_DIR=/models \
     LOG_LEVEL=info
 
