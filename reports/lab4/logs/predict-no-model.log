@@ -1,0 +1,8 @@
+HTTP/1.1 503 Service Unavailable
+date: Sun, 08 Nov 2026 21:42:47 GMT
+server: uvicorn
+content-length: 35
+content-type: application/json
+x-request-id: 93c88e5153b1
+
+{"detail":"no usable model loaded"}

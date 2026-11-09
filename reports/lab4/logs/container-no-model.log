@@ -1,0 +1,10 @@
+INFO:     Started server process [7]
+{"ts": "2026-11-08T21:41:37.286+00:00", "level": "WARNING", "event": "model_missing", "model_dir": "/models", "reason": "FileNotFoundError: [Errno 2] No such file or directory: '/models/model-metadata.json'", "git_sha": "e0c3bb98de3629f2d56d59715bb8afb3c1bd4ca4"}
+{"ts": "2026-11-08T21:42:17.975+00:00", "level": "WARNING", "event": "unavailable", "request_id": "13f6739e0f8e", "method": "GET", "path": "/health", "status": 503, "ms": 14.1, "model_version": null}
+{"ts": "2026-11-08T21:42:19.375+00:00", "level": "WARNING", "event": "unavailable", "request_id": "edee59014be9", "method": "GET", "path": "/health", "status": 503, "ms": 7.5, "model_version": null}
+{"ts": "2026-11-08T21:42:47.228+00:00", "level": "WARNING", "event": "unavailable", "request_id": "ecd2a5048012", "method": "GET", "path": "/health", "status": 503, "ms": 3.5, "model_version": null}
+{"ts": "2026-11-08T21:42:47.368+00:00", "level": "WARNING", "event": "unavailable", "request_id": "93c88e5153b1", "method": "POST", "path": "/predict", "status": 503, "ms": 3.7, "model_version": null}
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+{"ts": "2026-11-08T21:42:47.469+00:00", "level": "INFO", "event": "rejected", "request_id": "3f9fae843899", "method": "POST", "path": "/predict", "status": 422, "ms": 4.9, "model_version": null, "invalid_fields": ["hr:less_than_equal"]}
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
