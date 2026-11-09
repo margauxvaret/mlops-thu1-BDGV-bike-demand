@@ -290,6 +290,65 @@ model could not be used (missing file, SHA256 mismatch, different features).
   422; `error_at` points to the line to read for a 500. Unit tests check that a
   submitted value and an exception message never reach the log.
 
+
+### Deployment identity and external check (Person 3)
+
+Run the checker from the repository root while the container is running. It
+uses HTTP only for observations; it never imports the application or uses
+`TestClient`.
+
+```bash
+uv run --locked python scripts/check_deployment.py --model-dir artifacts
+```
+
+The expected model version comes from `artifacts/model-metadata.json`. The
+expected model SHA256 is recomputed from `artifacts/model.joblib` and checked
+against that metadata before making HTTP requests. The expected code revision
+comes independently from `git rev-parse HEAD`. The checker compares these
+values with `/health`, sends a valid `/predict` request, verifies that the
+prediction is finite and nonnegative, and sends an invalid request (`hr=24`)
+that must receive `422`. It prints a claim/expected/observed/result table and
+returns exit code `1` if any check fails (exit code `2` means the local expected
+identity could not be read).
+
+PowerShell equivalent:
+
+```powershell
+uv run --locked python .\scripts\check_deployment.py --model-dir .\artifacts
+if ($LASTEXITCODE -ne 0) { throw "Deployment check failed: $LASTEXITCODE" }
+```
+
+#### Identity: how can an operator tell which code and model are running?
+
+- **Our choice:** inject the commit with Docker's `GIT_SHA` build argument;
+  return it from `/health`. Report the loaded model version and the SHA256 of
+  its bytes from `/health` too.
+- **Rejected option:** infer identity from an image tag such as `latest` or
+  trust only a version string.
+- **Why:** tags can move, and a version label does not prove which file was
+  loaded. The commit and model content hash identify the running inputs.
+
+#### Expected: where do the checker’s expected values come from?
+
+- **Our choice:** read `model_version` from the local artifact metadata, hash
+  the local model file independently, and read the expected commit from
+  `git rev-parse HEAD`.
+- **Rejected option:** copy expected values from the service's `/health`
+  response.
+- **Why:** comparing the service with itself cannot reveal a stale image or
+  wrong model mount.
+
+#### Failure: how is a deployment failure demonstrated?
+
+- **Our choice:** start the built image without its model volume, then run the
+  same checker while keeping the expected model artifacts available locally.
+  `/health` and prediction checks must fail, the checker must exit `1`, and
+  `docker logs` must show `model_missing` plus the HTTP `503` request lines.
+- **Rejected option:** simulate the outage by calling application functions or
+  using an in-process test client.
+- **Why:** the exercise is to observe the running container from outside. Keep
+  the raw checker output and `docker logs` together under
+  `reports/evidence/lab5/` after running this scenario.
 ## Lab 4: API container and deployment (Person D)
 
 ### Model delivery decision
