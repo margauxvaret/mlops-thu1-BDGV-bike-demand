@@ -1,14 +1,18 @@
-name: Week 1 checks
+name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, integration]
+  push:
+    branches: [main, integration]
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   infrastructure:
@@ -22,7 +26,7 @@ jobs:
         with:
           version: "0.12.23"
           python-version: "3.12"
-      - run: uv lock --check    
+      - run: uv lock --check
       - run: uv sync --locked
       - run: uv run --locked python -m bike_demand.preflight
       - run: uv run --locked ruff check .
