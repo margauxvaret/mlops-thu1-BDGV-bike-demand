@@ -484,3 +484,92 @@ docker logs bdgv-api-lab4 2>&1 `
   | Tee-Object .\reports\lab4\logs\container-no-model.log
 docker rm -f bdgv-api-lab4
 ```
+
+## Lab 6: CI
+
+### Workflow (Person 1)
+
+`.github/workflows/ci.yml` runs one job, `checks`, on every pull request and
+push targeting `integration` or `main`, and on manual dispatch. Steps, in order:
+
+1. `uv lock --check`: `uv.lock` matches `pyproject.toml` (never regenerated).
+2. `uv sync --locked`: install from the lock file only.
+3. `uv run --locked ruff check .` and `uv run --locked ruff format --check .`
+4. `uv run --locked python -m bike_demand.preflight`
+5. `uv run --locked pytest -q -m infra`: fast plumbing tests.
+6. `uv run --locked pytest -q -m "not infra"`: every other test (`lab1`,
+   `exercise` and `tests/test_api.py`, which the starter never ran).
+
+Safe settings kept from the starter: `permissions: contents: read`, no secrets,
+`persist-credentials: false`, actions pinned by commit SHA, uv and Python
+versions pinned, `timeout-minutes: 15`.
+
+#### Machine: where do the checks run, and what do they not depend on?
+
+- **Our choice:** a fresh GitHub-hosted `ubuntu-24.04` runner for every run,
+  with uv `0.12.23` and Python `3.12` pinned, installing only from `uv.lock`
+  (`uv sync --locked`, `uv run --locked`).
+- **Rejected option:** `ubuntu-latest`, or trusting that tests pass on a team
+  laptop.
+- **Why:** `ubuntu-latest` changes under us without a commit. A laptop has a
+  warm `.venv`, local `artifacts/` and `tracking/` (both gitignored) that a
+  clean clone does not have; the runner starts from the repository alone.
+
+#### Trigger: which events run the workflow?
+
+- **Our choice:** `pull_request` and `push` on `integration` and `main`, plus
+  `workflow_dispatch`. A `concurrency` group cancels an older run of the same
+  pull request when a new commit is pushed; runs on `main` are never cancelled.
+- **Rejected option:** run on every push to every branch, or only on `main`
+  as in the starter.
+- **Why:** every change reaches `integration` or `main` through a pull request,
+  so it is checked before merge and again after merge, without duplicate runs
+  on feature branches. Only `main` was covered before, so PRs into the
+  integration branch were never checked.
+
+#### Order: why are the steps in this order?
+
+- **Our choice:** cheapest and most common failures first: lock check (seconds,
+  no install), install, ruff lint and format (seconds), preflight, fast `infra`
+  tests, then the rest of the suite (about 2 minutes).
+- **Rejected option:** run a single `pytest` first and style checks last.
+- **Why:** a stale lock or a style error is reported in seconds instead of
+  after the slow tests. On our first run with this order, `ruff check` failed
+  on `scripts/check_deployment.py` (unsorted imports, merged in PR #14) before
+  any test ran; the fix was one commit and the next run was green.
+
+## Lab 6: CI
+
+#### Machine: where do the checks run, and what do they not depend on?
+
+- **Our choice:** a fresh GitHub-hosted `ubuntu-24.04` runner for every run,
+  with uv `0.12.23` and Python `3.12` pinned, installing only from `uv.lock`
+  (`uv sync --locked`, `uv run --locked`).
+- **Rejected option:** `ubuntu-latest`, or trusting that tests pass on a team
+  laptop.
+- **Why:** `ubuntu-latest` changes under us without a commit. A laptop has a
+  warm `.venv`, local `artifacts/` and `tracking/` (both gitignored) that a
+  clean clone does not have; the runner starts from the repository alone.
+
+#### Trigger: which events run the workflow?
+
+- **Our choice:** `pull_request` and `push` on `integration` and `main`, plus
+  `workflow_dispatch`. A `concurrency` group cancels an older run of the same
+  pull request when a new commit is pushed; runs on `main` are never cancelled.
+- **Rejected option:** run on every push to every branch, or only on `main`
+  as in the starter.
+- **Why:** every change reaches `integration` or `main` through a pull request,
+  so it is checked before merge and again after merge, without duplicate runs
+  on feature branches. The starter only covered `main`, so PRs into the
+  integration branch were never checked.
+
+#### Order: why are the steps in this order?
+
+- **Our choice:** cheapest and most common failures first: lock check (seconds,
+  no install), install, ruff lint and format (seconds), preflight, fast `infra`
+  tests, then the rest of the suite (about 2 minutes).
+- **Rejected option:** run a single `pytest` first and style checks last.
+- **Why:** a stale lock or a style error is reported in seconds instead of
+  after the slow tests. On our first run with this order, `ruff check` failed
+  on `scripts/check_deployment.py` (unsorted imports, merged in PR #14) before
+  any test ran; the fix was one commit and the next run was green.
