@@ -225,3 +225,86 @@ docker rm lab3-rerun
 The model file is retained with the rerun evidence, not committed; record its
 SHA-256 in the team report. The rerun logs and metrics are in
 `reports/lab3/logs/`.
+
+
+## Lab 5 — Déploiement
+
+### 1. SHA du commit
+
+```
+f47c1151446891b3e6912862db352bb971fed261
+```
+
+(fichier brut : `reports/evidence/lab5/commit-sha.txt`)
+
+### 2. Image et commande utilisée
+
+ID de l'image : `sha256:5ac5fe4f2a563e19b86dfae700060a2a8d380850cefb4753fecb355f22f49c87` (`bdgv-api:lab5`)
+
+Build :
+
+```powershell
+docker build --progress=plain --build-arg GIT_COMMIT=$FULL -t bdgv-api:lab5 .
+```
+
+Run :
+
+```powershell
+docker run -d --name bike-api -e MODEL_DIR=/models -p 127.0.0.1:8000:8000 -v "${PWD}/artifacts:/models:ro" bdgv-api:lab5
+```
+
+Le label `org.opencontainers.image.revision` de l'image vaut `f47c1151446891b3e6912862db352bb971fed261`, identique au SHA du commit.
+
+### 3. Requêtes envoyées et logs obtenus
+
+| Requête | Attendu | Observé | Ligne de log |
+|---|---|---|---|
+| `GET /health` | 200 | 200, `{"status":"ok","model_version":"baseline-3231526734d2"}` | `INFO: 172.17.0.1:38998 - "GET /health HTTP/1.1" 200 OK` |
+| `POST /predict` valide | 200 | 200, `{"prediction":437.861105705694,"model_version":"baseline-3231526734d2"}` | `INFO: 172.17.0.1:39006 - "POST /predict HTTP/1.1" 200 OK` |
+| `POST /predict` avec `hr=24` | 422 | 422, `Input should be less than or equal to 23` | `INFO: 172.17.0.1:39016 - "POST /predict HTTP/1.1" 422 Unprocessable Entity` |
+
+Fichiers bruts : `reports/evidence/lab5/` (`health.txt`, `predict-valid.txt`, `predict-hr24.txt`, `docker-logs.txt`, `docker-build.txt`, `image-id.txt`, `commit-sha.txt`).
+
+### 4. Panne provoquée
+
+- **Panne** : lancement du conteneur sans monter le modèle (pas de `-v`).
+- **Statut HTTP** : 503 sur `/health`.
+- **Corps** : `{"status":"unavailable","reason":"FileNotFoundError: [Errno 2] No such file or directory: '/models/model-metadata.json'"}`
+- **Logs** : `No usable model in /models (FileNotFoundError: ... '/models/model-metadata.json')` puis `GET /health ... 503 Service Unavailable`
+- **Script** : non lancé (script absent, voir blocages).
+
+Fichiers : `failure-health.txt`, `failure-docker-logs.txt`.
+
+### 5. Blocages
+
+1. **Script de vérification absent**
+   - Étape : `uv run python scripts/check_deployment.py`
+   - Message : `can't open file '...\scripts\check_deployment.py': [Errno 2] No such file or directory` (exit code 2)
+   - Qui doit agir : personne 3 (script), puis merge dans la branche d'intégration.
+2. **`/health` ne contient pas l'identité du service**
+   - Constat : seulement `status` et `model_version`, pas de `git_sha` ni `model_sha256`.
+   - Qui doit agir : personne 1 (ajout des champs).
+3. **Logs non structurés**
+   - Constat : logs texte uvicorn, pas de ligne JSON avec id de requête, durée et `model_version`.
+   - Qui doit agir : personne 2.
+4. **Port 8000 déjà occupé** (résolu)
+   - Message : `Bind for 0.0.0.0:8000 failed: port is already allocated`
+   - Cause : un ancien conteneur du Lab 4 (`funny_williams`) tournait. Résolu par `docker stop funny_williams`.
+
+
+### 6. Les 10 questions
+
+| Question | Notre choix | Option écartée | Pourquoi |
+|---|---|---|---|
+| **settings** | Config par variables d'environnement (`-e MODEL_DIR=/models`) | Valeurs en dur dans l'image | Une même image sert pour plusieurs configurations sans rebuild |
+| **model** | Modèle monté depuis `./artifacts` avec `-v ...:ro` | Modèle copié dans l'image | L'image reste indépendante du modèle, on change de modèle sans rebuild (à confirmer avec P1) |
+| **ready** | Prêt = `/health` répond 200 (modèle chargé) | Considérer prêt dès que le conteneur tourne | Un conteneur « Up » sans modèle ne peut pas prédire |
+| **broken** | 503 sur `/health` et sur `/predict` avec un message sur le modèle introuvable | Plantage au démarrage | Le service reste joignable et dit clairement ce qui manque |
+| **log line** | Une ligne JSON par requête sur stdout : événement, id de requête, route, statut, durée en ms, `model_version` | Logs texte libres d'uvicorn | Quelqu'un qui lit seulement `docker logs` comprend ce qui s'est passé, et les 422 et 503 sont aussi loggés |
+| **secrets** | Jamais de secrets, de variables d'environnement sensibles ni de corps de requête complet dans les logs | Tout loguer pour faciliter le débogage | Les logs sont lus par d'autres personnes et conservés : une fuite y serait durable |
+| **identity** | `/health` expose `model_version`, `model_sha256` (calculé au chargement du modèle) et `git_sha` (injecté au build) | Un numéro de version écrit à la main | Ces valeurs viennent des artefacts réels et peuvent être vérifiées de l'extérieur |
+| **expected** | Valeurs attendues lues dans les métadonnées de l'artefact modèle et avec `git rev-parse HEAD` | Lire les valeurs dans `/health` lui-même | Comparer le service à ce qu'il dit de lui-même ne prouve rien |
+| **failure** | Lancement sans modèle (503) | Image construite sur un ancien commit | Panne simple à provoquer, visible dans `/health` et dans les logs |
+| **promise** | Un service déployé promet de dire la vérité sur lui-même : quel code (`git_sha`), quel modèle (`model_version`, `model_sha256`), s'il est prêt (200) ou non (503 avec un message clair), et de laisser des logs qui expliquent chaque requête | Promettre seulement « le conteneur tourne » | Un conteneur qui tourne sans modèle ou avec le mauvais code est en panne sans que ça se voie |
+
+**Définition de « déployé »** : le conteneur tourne depuis une image construite à partir d'un commit connu, `/health` répond 200, et une vérification faite de l'extérieur (HTTP sur `127.0.0.1:8000`) confirme que `git_sha`, `model_version` et `model_sha256` sont ceux attendus, qu'un `/predict` valide répond 200 et qu'une entrée invalide répond 422. Un conteneur « Up » qui n'a pas passé cette vérification n'est pas considéré comme déployé.
