@@ -18,7 +18,6 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-
 VALID_REQUEST = {
     "season": 1,
     "yr": 0,
@@ -36,7 +35,12 @@ VALID_REQUEST = {
 
 
 def _http(
-    base_url: str, path: str, *, method: str = "GET", payload: Any = None, timeout: float
+    base_url: str,
+    path: str,
+    *,
+    method: str = "GET",
+    payload: Any = None,
+    timeout: float,
 ) -> tuple[int | None, Any]:
     data = None if payload is None else json.dumps(payload).encode("utf-8")
     headers = {"Accept": "application/json"}
@@ -126,7 +130,12 @@ def main() -> int:
         expected_version, expected_model_sha, expected_git_sha = _load_expected(
             args.model_dir, repo_root, args.git_sha
         )
-    except (OSError, ValueError, json.JSONDecodeError, subprocess.SubprocessError) as error:
+    except (
+        OSError,
+        ValueError,
+        json.JSONDecodeError,
+        subprocess.SubprocessError,
+    ) as error:
         parser.exit(2, f"Cannot load independent expected identity: {error}\n")
 
     rows: list[tuple[str, str, str, bool]] = []
@@ -164,9 +173,7 @@ def main() -> int:
         timeout=args.timeout,
     )
     prediction = (
-        prediction_body.get("prediction")
-        if isinstance(prediction_body, dict)
-        else None
+        prediction_body.get("prediction") if isinstance(prediction_body, dict) else None
     )
     if isinstance(prediction, (int, float)) and not isinstance(prediction, bool):
         finite_nonnegative = math.isfinite(prediction) and prediction >= 0
@@ -191,10 +198,7 @@ def main() -> int:
     add("invalid /predict status (hr=24)", 422, invalid_status, invalid_status == 422)
 
     headers = ("claim", "expected", "observed", "result")
-    widths = [
-        max(len(headers[i]), *(len(row[i]) for row in rows))
-        for i in range(3)
-    ]
+    widths = [max(len(headers[i]), *(len(row[i]) for row in rows)) for i in range(3)]
     print(" | ".join(headers[i].ljust(widths[i]) for i in range(3)) + " | result")
     print("-+-".join("-" * width for width in widths) + "-+--------")
     for claim, expected, observed, passed in rows:

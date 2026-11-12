@@ -1,31 +1,42 @@
-name: Week 1 checks
+name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, integration]
+  push:
+    branches: [main, integration]
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  infrastructure:
+  checks:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4
         with:
           version: "0.12.23"
           python-version: "3.12"
-      - run: uv lock --check    
-      - run: uv sync --locked
-      - run: uv run --locked python -m bike_demand.preflight
-      - run: uv run --locked ruff check .
-      - run: uv run --locked ruff format --check .
-      - run: uv run --locked pytest -q -m infra
-      - run: uv run --locked pytest -q -m lab1
+      - name: Lock file is up to date (no regeneration)
+        run: uv lock --check
+      - name: Install from lock file only
+        run: uv sync --locked
+      - name: Lint (ruff)
+        run: uv run --locked ruff check .
+      - name: Format (ruff)
+        run: uv run --locked ruff format --check .
+      - name: Preflight
+        run: uv run --locked python -m bike_demand.preflight
+      - name: Infra tests (fast)
+        run: uv run --locked pytest -q -m infra
+      - name: All other tests (lab1, exercise, API)
+        run: uv run --locked pytest -q -m "not infra"
