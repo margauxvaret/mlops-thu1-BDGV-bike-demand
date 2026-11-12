@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  infrastructure:
+  checks:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -26,10 +26,17 @@ jobs:
         with:
           version: "0.12.23"
           python-version: "3.12"
-      - run: uv lock --check
-      - run: uv sync --locked
-      - run: uv run --locked python -m bike_demand.preflight
-      - run: uv run --locked ruff check .
-      - run: uv run --locked ruff format --check .
-      - run: uv run --locked pytest -q -m infra
-      - run: uv run --locked pytest -q -m lab1
+      - name: Lock file is up to date (no regeneration)
+        run: uv lock --check
+      - name: Install from lock file only
+        run: uv sync --locked
+      - name: Lint (ruff)
+        run: uv run --locked ruff check .
+      - name: Format (ruff)
+        run: uv run --locked ruff format --check .
+      - name: Preflight
+        run: uv run --locked python -m bike_demand.preflight
+      - name: Infra tests (fast)
+        run: uv run --locked pytest -q -m infra
+      - name: All other tests (lab1, exercise, API)
+        run: uv run --locked pytest -q -m "not infra"
