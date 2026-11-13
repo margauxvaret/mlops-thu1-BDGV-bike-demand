@@ -100,7 +100,7 @@ uv run --locked mlflow server --backend-store-uri sqlite:///tracking/mlflow.db -
 
 `artifacts/`, `tracking/` and `.venv/` are ignored by Git. Team metrics may be
 committed as evidence; never commit credentials or individual private reports.
-CI currently checks only infrastructure/quality; expand it in Week 3.
+CI now runs lock, lint, format, preflight and the full test suite on every PR: see "Lab 6: CI" below.
 
 ## Support and individual reports
 
@@ -538,38 +538,78 @@ versions pinned, `timeout-minutes: 15`.
   on `scripts/check_deployment.py` (unsorted imports, merged in PR #14) before
   any test ran; the fix was one commit and the next run was green.
 
-## Lab 6: CI
+### Reproduce a CI failure locally (Person 4)
 
-#### Machine: where do the checks run, and what do they not depend on?
+Run the same commands as CI, in the same order. Stop at the first failure.
 
-- **Our choice:** a fresh GitHub-hosted `ubuntu-24.04` runner for every run,
-  with uv `0.12.23` and Python `3.12` pinned, installing only from `uv.lock`
-  (`uv sync --locked`, `uv run --locked`).
-- **Rejected option:** `ubuntu-latest`, or trusting that tests pass on a team
-  laptop.
-- **Why:** `ubuntu-latest` changes under us without a commit. A laptop has a
-  warm `.venv`, local `artifacts/` and `tracking/` (both gitignored) that a
-  clean clone does not have; the runner starts from the repository alone.
+**bash (Linux, macOS, Git Bash)**
+```bash
+uv lock --check
+uv sync --locked
+uv run --locked ruff check .
+uv run --locked ruff format --check .
+uv run --locked python -m bike_demand.preflight
+uv run --locked pytest -q -m infra
+uv run --locked pytest -q -m "not infra"
+```
 
-#### Trigger: which events run the workflow?
+**PowerShell (Windows)**
+```powershell
+uv lock --check
+uv sync --locked
+uv run --locked ruff check .
+uv run --locked ruff format --check .
+uv run --locked python -m bike_demand.preflight
+uv run --locked pytest -q -m infra
+uv run --locked pytest -q -m "not infra"
+```
 
-- **Our choice:** `pull_request` and `push` on `integration` and `main`, plus
-  `workflow_dispatch`. A `concurrency` group cancels an older run of the same
-  pull request when a new commit is pushed; runs on `main` are never cancelled.
-- **Rejected option:** run on every push to every branch, or only on `main`
-  as in the starter.
-- **Why:** every change reaches `integration` or `main` through a pull request,
-  so it is checked before merge and again after merge, without duplicate runs
-  on feature branches. The starter only covered `main`, so PRs into the
-  integration branch were never checked.
+Run one test: `uv run --locked pytest tests/test_api.py -v` (same in both shells).
 
-#### Order: why are the steps in this order?
+Replay our real CI failure (PR #16): `git switch --detach 12b519d`, then
+`uv run --locked ruff check .` reports `I001 Import block is un-sorted` in
+`scripts/check_deployment.py`. Go back with `git switch -`.
 
-- **Our choice:** cheapest and most common failures first: lock check (seconds,
-  no install), install, ruff lint and format (seconds), preflight, fast `infra`
-  tests, then the rest of the suite (about 2 minutes).
-- **Rejected option:** run a single `pytest` first and style checks last.
-- **Why:** a stale lock or a style error is reported in seconds instead of
-  after the slow tests. On our first run with this order, `ruff check` failed
-  on `scripts/check_deployment.py` (unsorted imports, merged in PR #14) before
-  any test ran; the fix was one commit and the next run was green.
+Never run `uv lock` or drop `--locked` to make a failure disappear: a stale lock
+is a real failure, fixed by committing `pyproject.toml` and `uv.lock` together.
+
+#### Coverage: what does CI check, and what does it not see?
+
+- **Our choice:** coverage is a list of named defects, each tied to a test that
+  we made fail on purpose (test map in the team report, Lab 6 section). CI does
+  not see: the training run, our local MLflow runs in `tracking/`, local model
+  files in `artifacts/` (both gitignored) or the live Cloud Run service (only the
+  deploy job on `main` checks it).
+- **Rejected option:** a line-coverage percentage (`pytest-cov`) as our coverage claim.
+- **Why:** a percentage says which lines ran, not which defect would turn the run
+  red. A test only counts once we have seen it fail for its defect.
+
+#### Evidence: where is the proof, and why there?
+
+- **Our choice:** raw run logs saved as text in `reports/evidence/lab6/`, with
+  `INDEX.md` giving the run link, commit SHA, PR and result for each file.
+- **Rejected option:** links to GitHub Actions runs, or screenshots only.
+- **Why:** run logs expire after the retention period and screenshots cannot be
+  searched or compared. Text plus a commit SHA lets anyone check the log
+  against the exact code.
+
+#### Repair: show one real red-to-green.
+
+- **Our choice:** PR #16. Commit `12b519d` added the ruff steps; run
+  [43183335657](https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand/actions/runs/43183335657)
+  failed at `Lint (ruff)` after 19 s with `I001 Import block is un-sorted` in
+  `scripts/check_deployment.py`. Commit `973ba53` sorted and reformatted the file;
+  run [43184757992](https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand/actions/runs/43184757992)
+  was green. Logs: `reports/evidence/lab6/01-pr16-rouge*.txt`, `02-pr16-vert.txt`.
+- **Rejected option:** pressing "Re-run jobs", or breaking code artificially just to show red.
+- **Why:** a re-run without a change proves nothing. Here a real defect (from the
+  Lab 5 code) was caught by a new check and fixed by a new commit on the same PR.
+
+#### Records: what do we keep, and how do we find it later?
+
+- **Our choice:** in the repository: raw logs and `INDEX.md`, commit SHAs, the
+  Cloud Run revision name and the identity output (`git_sha`, `model_version`,
+  `model_sha256`), and the annotated tag `m3` on the submitted commit.
+- **Rejected option:** relying on the GitHub Actions history and the Cloud Run console.
+- **Why:** both live outside the repository and change or expire. The tag plus
+  the committed files freeze what was checked and when.
