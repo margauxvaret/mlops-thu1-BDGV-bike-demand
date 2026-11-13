@@ -10,7 +10,9 @@ from pathlib import Path
 
 import joblib
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from bike_demand.request_logging import (
     configure_logging,
@@ -89,6 +91,15 @@ async def lifespan(app: FastAPI):
 # JSON log lines on stdout (level from LOG_LEVEL); read them with docker logs.
 configure_logging()
 app = FastAPI(title="Bike demand prediction", lifespan=lifespan)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, exc: RequestValidationError):
+    # Invalid inputs may contain NaN/Infinity, which JSON cannot represent.
+    details = [
+        {key: error[key] for key in ("type", "loc", "msg")} for error in exc.errors()
+    ]
+    return JSONResponse(status_code=422, content={"detail": details})
 
 
 @app.get("/health")
