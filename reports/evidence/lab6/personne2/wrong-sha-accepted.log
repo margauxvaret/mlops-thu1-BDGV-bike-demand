@@ -1,0 +1,39 @@
+Mutation: if digest != metadata["model_sha256"]: -> if False:
+Commande: python -m pytest -q tests/test_api.py::test_wrong_model_sha_is_rejected
+Code de sortie: 1
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________________ test_wrong_model_sha_is_rejected _______________________
+
+model_dir = WindowsPath('C:/Users/victo/AppData/Local/Temp/pytest-of-victo/pytest-2/test_wrong_model_sha_is_reject0/model')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000016D344E9E80>
+
+    def test_wrong_model_sha_is_rejected(model_dir, monkeypatch):
+        metadata_path = model_dir / "model-metadata.json"
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        metadata["model_sha256"] = "0" * 64
+        metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+        monkeypatch.setenv(MODEL_DIR_ENV, str(model_dir))
+        with TestClient(app) as c:
+            health = c.get("/health")
+>           assert health.status_code == 503
+E           assert 200 == 503
+E            +  where 200 = <Response [200 OK]>.status_code
+
+tests\test_api.py:211: AssertionError
+---------------------------- Captured stdout call -----------------------------
+{"ts": "2026-11-12T10:25:42.390+00:00", "level": "INFO", "event": "model_loaded", "model_dir": "C:\\Users\\victo\\AppData\\Local\\Temp\\pytest-of-victo\\pytest-2\\test_wrong_model_sha_is_reject0\\model", "model_version": "test-0.0.1", "model_sha256": "398c67f9cf0b508594ac251597c40370067b26aa872e50a497a0cd638dead411", "git_sha": "unknown"}
+{"ts": "2026-11-12T10:25:42.394+00:00", "level": "INFO", "event": "served", "request_id": "b192bf17766b", "method": "GET", "path": "/health", "status": 200, "ms": 2.7, "model_version": "test-0.0.1"}
+------------------------------ Captured log call ------------------------------
+INFO     bike_demand.api:request_logging.py:80 model_loaded
+INFO     bike_demand.api:request_logging.py:80 served
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\victo\OneDrive\Documents\ChatGPT\victor\mlops-thu1-BDGV-bike-demand-lab6-ci-workflow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_api.py::test_wrong_model_sha_is_rejected - assert 200 == 503
+1 failed, 1 warning in 6.27s
