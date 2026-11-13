@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 import shutil
+import subprocess
 import sys
 import uuid
 from pathlib import Path
@@ -30,6 +31,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA_CSV = ROOT / "data" / "raw" / "hour.csv"
 LOCK_FILE = ROOT / "uv.lock"
 CANDIDATES = ROOT / "artifacts" / "candidates"
+CODE_DIR = "src/bike_demand"
 TARGET = "cnt"
 
 EXPECTED_ROWS = {"train": 8645, "validation": 4358, "test": 4376}
@@ -67,6 +69,18 @@ def load_contract_splits() -> dict[str, pd.DataFrame]:
     return {"train": train, "validation": validation}
 
 
+def code_tree_sha(root: Path = ROOT) -> str:
+    """Empreinte Git du code du paquet : ne change que si le code change."""
+    result = subprocess.run(
+        ["git", "rev-parse", f"HEAD:{CODE_DIR}"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return result.stdout.strip()
+
+
 def build_identity(settings: dict, root: Path = ROOT) -> dict:
     """Les entrées qui déterminent un run. Refuse un arbre git sale."""
     dirty = working_tree_dirty(root)
@@ -77,7 +91,7 @@ def build_identity(settings: dict, root: Path = ROOT) -> dict:
     return {
         "data_sha256": sha256(DATA_CSV),
         "lock_sha256": sha256(LOCK_FILE),
-        "git_sha": training_commit(root),
+        "code_tree_sha": code_tree_sha(root),
         "settings": settings,
         "features": list(FEATURES),
     }
@@ -133,6 +147,7 @@ def run_pipeline(settings_path: Path, candidates_dir: Path = CANDIDATES) -> Path
         manifest = {
             "run_id": run_id,
             "identity": identity,
+            "git_sha": training_commit(ROOT),
             "model_sha256": sha256(model_path),
             "rows": {name: len(df) for name, df in splits.items()},
             "status": "candidate",
