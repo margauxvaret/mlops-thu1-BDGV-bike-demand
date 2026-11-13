@@ -9,6 +9,7 @@ artifacts/accepted/
 Usage :
     uv run --locked python -m bike_demand.promote status
     uv run --locked python -m bike_demand.promote adopt
+    uv run --locked python -m bike_demand.promote promote --candidate <dir> --decision <json> --expected-incumbent <id|none>
 """
 
 from __future__ import annotations
@@ -33,6 +34,9 @@ SERVED = ROOT / "artifacts"
 MODEL_FILE = "model.joblib"
 METADATA_FILE = "model-metadata.json"
 MANIFEST_FILE = "manifest.json"
+
+DECISION_STATUS_FIELD = "status"
+DECISION_DIGEST_FIELD = "model_sha256"
 
 
 def _now() -> str:
@@ -157,17 +161,110 @@ def adopt(accepted: Path = ACCEPTED, served: Path = SERVED) -> dict:
         return pointer
 
 
+def _api_metadata(manifest: dict, version_id: str) -> dict:
+    """Métadonnées compatibles avec api.py (model_sha256, model_version, features)."""
+    identity = manifest["identity"]
+    return {
+        "model_version": f"rf-{manifest['run_id']}",
+        "model_sha256": manifest["model_sha256"],
+        "features": identity["features"],
+        "data_sha256": identity["data_sha256"],
+        "training_commit": manifest.get("git_sha"),
+        "config": {"model": identity["settings"]},
+        "run_id": manifest["run_id"],
+        "accepted_version_id": version_id,
+    }
+
+
+def promote(
+    candidate_dir: Path,
+    decision_path: Path,
+    expected_incumbent: str,
+    accepted: Path = ACCEPTED,
+) -> dict:
+    """Promeut un candidat décidé. Tout contrôle raté lève AVANT de modifier l'état."""
+    # 1) La décision doit être un accept.
+    decision = json.loads(decision_path.read_text(encoding="utf-8"))
+    status = decision.get(DECISION_STATUS_FIELD)
+    if status != "accept":
+        raise RuntimeError(f"promotion refusée : décision {status!r}, pas 'accept'")
+
+    # 2) Les octets du candidat sont exactement ceux décidés.
+    manifest = json.loads((candidate_dir / MANIFEST_FILE).read_text(encoding="utf-8"))
+    candidate_sha = sha256(candidate_dir / MODEL_FILE)
+    decided_sha = decision.get(DECISION_DIGEST_FIELD)
+    if not candidate_sha == manifest["model_sha256"] == decided_sha:
+        raise RuntimeError(
+            f"octets différents : fichier {candidate_sha}, manifest "
+            f"{manifest['model_sha256']}, décision {decided_sha}. Échec fermé."
+        )
+
+    with accepted_lock(accepted):
+        # 3) L'incumbent n'a pas changé depuis la décision (compare-and-swap).
+        current = read_pointer(accepted)
+        current_id = current["version_id"] if current else "none"
+        if current_id != expected_incumbent:
+            raise RuntimeError(
+                f"incumbent changé : attendu {expected_incumbent}, "
+                f"trouvé {current_id}. Refaire la décision."
+            )
+
+        # 4) Installer la nouvelle version, immuable, avant de toucher au pointeur.
+        version_id = _next_version_id(accepted)
+        metadata = _api_metadata(manifest, version_id)
+        record = {
+            "version_id": version_id,
+            "source": f"promoted from candidate {manifest['run_id']}",
+            "model_sha256": candidate_sha,
+            "model_version": metadata["model_version"],
+            "decision_file": str(decision_path),
+            "decision_sha256": sha256(decision_path),
+        }
+        _install_version(
+            accepted, version_id, candidate_dir / MODEL_FILE, metadata, record
+        )
+
+        # 5) Basculer le pointeur atomiquement, en gardant la version remplacée.
+        pointer = {
+            "version_id": version_id,
+            "model_sha256": candidate_sha,
+            "model_version": metadata["model_version"],
+            "previous": current_id,
+            "decision_sha256": record["decision_sha256"],
+            "updated_at": _now(),
+        }
+        _write_json_atomic(accepted / "CURRENT.json", pointer)
+        _append_history(accepted, {"event": "promote", **pointer})
+        return pointer
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="État accepté Lab 7.")
+    parser.add_argument(
+        "--accepted", type=Path, default=ACCEPTED, help="dossier d'état accepté"
+    )
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("status", help="affiche la version acceptée courante")
     sub.add_parser("adopt", help="adopte le modèle servi comme model-001")
+    p = sub.add_parser("promote", help="promeut un candidat décidé 'accept'")
+    p.add_argument("--candidate", required=True, type=Path)
+    p.add_argument("--decision", required=True, type=Path)
+    p.add_argument(
+        "--expected-incumbent",
+        required=True,
+        help="version_id vu au moment de la décision, ou 'none'",
+    )
     args = parser.parse_args(argv)
 
     if args.command == "status":
-        print(json.dumps(read_pointer(), indent=2, sort_keys=True))
+        print(json.dumps(read_pointer(args.accepted), indent=2, sort_keys=True))
     elif args.command == "adopt":
-        print(json.dumps(adopt(), indent=2, sort_keys=True))
+        print(json.dumps(adopt(args.accepted), indent=2, sort_keys=True))
+    elif args.command == "promote":
+        result = promote(
+            args.candidate, args.decision, args.expected_incumbent, args.accepted
+        )
+        print(json.dumps(result, indent=2, sort_keys=True))
     return 0
 
 
