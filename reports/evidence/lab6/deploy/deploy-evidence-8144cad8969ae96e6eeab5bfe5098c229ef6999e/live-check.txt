@@ -1,0 +1,11 @@
+claim                            | expected                                                         | observed                                                         | result
+---------------------------------+------------------------------------------------------------------+------------------------------------------------------------------+--------
+/health HTTP status              | 200                                                              | 200                                                              | PASS
+model_version                    | baseline-3231526734d2                                            | baseline-3231526734d2                                            | PASS
+model_sha256                     | fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304 | fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304 | PASS
+git_sha                          | 8144cad8969ae96e6eeab5bfe5098c229ef6999e                         | 8144cad8969ae96e6eeab5bfe5098c229ef6999e                         | PASS
+valid /predict status            | 200                                                              | 200                                                              | PASS
+valid prediction finite and >= 0 | finite number >= 0                                               | 68.88371887808488                                                | PASS
+invalid /predict status (hr=24)  | 422                                                              | 422                                                              | PASS
+
+7/7 checks passed
