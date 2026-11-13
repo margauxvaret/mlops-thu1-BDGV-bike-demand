@@ -125,7 +125,7 @@ def run_pipeline(settings_path: Path, candidates_dir: Path = CANDIDATES) -> Path
 
         # Ajuster UNIQUEMENT sur le train.
         model = RandomForestRegressor(**settings)
-        model.fit(select_features(train), train[TARGET])
+        model.fit(select_features(train, FEATURES), train[TARGET])
 
         model_path = tmp_dir / "model.joblib"
         joblib.dump(model, model_path)
