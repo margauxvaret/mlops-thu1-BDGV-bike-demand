@@ -1,0 +1,420 @@
+checks	UNKNOWN STEP	﻿2026-11-12T08:39:35.8190908Z Current runner version: '2.338.2'
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8219094Z ##[group]Runner Image Provisioner
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8219916Z Hosted Compute Agent
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8220595Z Version: 20261028.624
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8221169Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8221816Z Build Date: 2026-10-28T21:51:42Z
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8222501Z Worker ID: {87872f27-ea50-4c2f-aa1d-7d1e3397e491}
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8223146Z Region: centralus
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8223725Z Cloud: Azure
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8224272Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8225912Z ##[group]Operating System
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8226839Z Ubuntu
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8227314Z 24.04.5
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8227861Z LTS
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8228344Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8228849Z ##[group]Runner Image
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8229459Z Image: ubuntu-24.04
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8229985Z Version: 20261101.360.1
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8231289Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261101.360/images/ubuntu/Ubuntu2404-Readme.md
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8232743Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261101.360
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8233664Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8234740Z ##[group]GITHUB_TOKEN Permissions
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8236951Z Contents: read
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8237484Z Metadata: read
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8238104Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8240236Z Secret source: Actions
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8241062Z Cache mode: write
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8241805Z Prepare workflow directory
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8725345Z Prepare all required actions
+checks	UNKNOWN STEP	2026-11-12T08:39:35.8792623Z Getting action download info
+checks	UNKNOWN STEP	2026-11-12T08:39:36.2144895Z Download action repository 'actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+checks	UNKNOWN STEP	2026-11-12T08:39:36.3224488Z Download action repository 'astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4' (SHA:bec219d24cd3e171d82865faccec33120bb574f4)
+checks	UNKNOWN STEP	2026-11-12T08:39:36.8969087Z Complete job name: checks
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9604511Z ##[group]Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9605052Z with:
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9605305Z   persist-credentials: false
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9605644Z   repository: margauxvaret/mlops-thu1-BDGV-bike-demand
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9608301Z   token: ***
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9608539Z   ssh-strict: true
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9608781Z   ssh-user: git
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9609016Z   clean: true
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9609266Z   sparse-checkout-cone-mode: true
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9609548Z   fetch-depth: 1
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9609780Z   fetch-tags: false
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9610025Z   show-progress: true
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9610274Z   lfs: false
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9610501Z   submodules: false
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9610745Z   set-safe-directory: true
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9611024Z   allow-unsafe-pr-checkout: false
+checks	UNKNOWN STEP	2026-11-12T08:39:36.9611398Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2159142Z Syncing repository: margauxvaret/mlops-thu1-BDGV-bike-demand
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2161959Z ##[group]Getting Git version info
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2163178Z Working directory is '/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand'
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2165606Z [command]/usr/bin/git version
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2316987Z git version 2.56.0
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2322763Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2380900Z Temporarily overriding HOME='/home/runner/work/_temp/f3e55e1f-30cd-4bbb-9205-7bfac730165d' before making global git config changes
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2408437Z Adding repository directory to the temporary git global config as a safe directory
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2416241Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2450962Z Deleting the contents of '/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand'
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2484337Z ##[group]Determining repository object format
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2486558Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2488561Z ##[group]Initializing the repository
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2489855Z [command]/usr/bin/git init /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2621472Z hint: Using 'master' as the name for the initial branch. This default branch name
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2631127Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2642757Z hint: to use in all of your new repositories, which will suppress this warning,
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2645874Z hint: call:
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2664668Z hint:
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2665541Z hint: 	git config --global init.defaultBranch <name>
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2666410Z hint:
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2667065Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2668167Z hint: 'development'. The just-created branch can be renamed via this command:
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2668975Z hint:
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2669449Z hint: 	git branch -m <name>
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2670139Z hint:
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2671184Z hint: Disable this message with "git config set advice.defaultBranchName false"
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2672530Z Initialized empty Git repository in /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.git/
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2674970Z [command]/usr/bin/git remote add origin https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2914927Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2917057Z ##[group]Disabling automatic garbage collection
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2918297Z [command]/usr/bin/git config --local gc.auto 0
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2971927Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2974048Z ##[group]Setting up auth
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2976934Z Removing SSH command configuration
+checks	UNKNOWN STEP	2026-11-12T08:39:37.2980361Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+checks	UNKNOWN STEP	2026-11-12T08:39:37.3041113Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+checks	UNKNOWN STEP	2026-11-12T08:39:37.3383266Z Removing HTTP extra header
+checks	UNKNOWN STEP	2026-11-12T08:39:37.3389150Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+checks	UNKNOWN STEP	2026-11-12T08:39:37.3434205Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+checks	UNKNOWN STEP	2026-11-12T08:39:37.3653517Z Removing includeIf entries pointing to credentials config files
+checks	UNKNOWN STEP	2026-11-12T08:39:37.3656884Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+checks	UNKNOWN STEP	2026-11-12T08:39:37.3704843Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+checks	UNKNOWN STEP	2026-11-12T08:39:37.3924014Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+checks	UNKNOWN STEP	2026-11-12T08:39:37.3973466Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.git.path /home/runner/work/_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:37.4023436Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:37.4070217Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:37.4112051Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:37.4154817Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:37.4157089Z ##[group]Fetching the repository
+checks	UNKNOWN STEP	2026-11-12T08:39:37.4162149Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +f72364b292fff63ec978211eb53f7d43ae5b8ad2:refs/remotes/pull/16/merge
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9168059Z From https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9433994Z  * [new ref]         f72364b292fff63ec978211eb53f7d43ae5b8ad2 -> pull/16/merge
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9438466Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9439746Z ##[group]Determining the checkout info
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9441132Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9442071Z [command]/usr/bin/git sparse-checkout disable
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9446786Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9451578Z ##[group]Checking out the ref
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9453018Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/16/merge
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9454620Z Note: switching to 'refs/remotes/pull/16/merge'.
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9455658Z 
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9456595Z You are in 'detached HEAD' state. You can look around, make experimental
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9458521Z changes and commit them, and you can discard any commits you make in this
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9460520Z state without impacting any branches by switching back to a branch.
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9461739Z 
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9462730Z If you want to create a new branch to retain commits you create, you may
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9464724Z do so (now or later) by using -c with the switch command. Example:
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9465885Z 
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9466708Z   git switch -c <new-branch-name>
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9467582Z 
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9468112Z Or undo this operation with:
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9468903Z 
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9469402Z   git switch -
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9470032Z 
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9471040Z Turn off this advice by setting config variable advice.detachedHead to false
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9472387Z 
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9474509Z HEAD is now at f72364b Merge 973ba535590b92d5f700e146f9f776738a9b9f1e into c3790383a39390cb0988b9048981f545d67ee67b
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9479294Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9513518Z [command]/usr/bin/git log -1 --format=%H
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9537988Z f72364b292fff63ec978211eb53f7d43ae5b8ad2
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9558769Z ##[group]Removing auth
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9560141Z Removing SSH command configuration
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9562840Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9595165Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9833834Z Removing HTTP extra header
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9836409Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+checks	UNKNOWN STEP	2026-11-12T08:39:37.9880620Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0103578Z Removing includeIf entries pointing to credentials config files
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0108396Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0151771Z includeif.gitdir:/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.git.path
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0155975Z includeif.gitdir:/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.git/worktrees/*.path
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0159805Z includeif.gitdir:/github/workspace/.git.path
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0163064Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0167765Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.git.path
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0221617Z /home/runner/work/_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0965742Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.git.path /home/runner/work/_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0978684Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.git/worktrees/*.path
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0982552Z /home/runner/work/_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0990191Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:38.0998655Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1004512Z /github/runner_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1091905Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1098157Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1101203Z /github/runner_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1106818Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1115495Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1120200Z Removing credentials config '/home/runner/work/_temp/git-credentials-c3645856-b681-40bf-a2e5-ddd1500d9053.config'
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1123600Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1400044Z ##[group]Run astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1401008Z with:
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1401559Z   version: 0.12.23
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1402133Z   python-version: 3.12
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1402745Z   activate-environment: false
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1403391Z   no-project: false
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1404367Z   working-directory: /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1410439Z   github-token: ***
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1411011Z   enable-cache: auto
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1412338Z   cache-dependency-glob: **/*requirements*.txt
+checks	UNKNOWN STEP	**/*requirements*.in
+checks	UNKNOWN STEP	**/*constraints*.txt
+checks	UNKNOWN STEP	**/*constraints*.in
+checks	UNKNOWN STEP	**/pyproject.toml
+checks	UNKNOWN STEP	**/uv.lock
+checks	UNKNOWN STEP	**/*.py.lock
+checks	UNKNOWN STEP	
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1413796Z   restore-cache: true
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1414368Z   save-cache: true
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1414923Z   prune-cache: false
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1415490Z   cache-python: false
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1416170Z   ignore-nothing-to-cache: false
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1416947Z   ignore-empty-workdir: false
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1417640Z   download-from-astral-mirror: true
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1418341Z   add-problem-matchers: true
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1418951Z   quiet: false
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1419504Z   resolution-strategy: highest
+checks	UNKNOWN STEP	2026-11-12T08:39:38.1420152Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:38.3064418Z Fetching manifest data from https://raw.githubusercontent.com/astral-sh/versions/main/v1/uv.ndjson ...
+checks	UNKNOWN STEP	2026-11-12T08:39:38.4328923Z Downloading uv from "https://releases.astral.sh/github/uv/releases/download/0.12.23/uv-x86_64-unknown-linux-gnu.tar.gz" ...
+checks	UNKNOWN STEP	2026-11-12T08:39:38.6262916Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/02059236-00f6-4a0a-8954-c1f506e02f73 -f /home/runner/work/_temp/984f5686-ca45-4173-ad2f-fb9ba106a80b
+checks	UNKNOWN STEP	2026-11-12T08:39:39.2528161Z Added /home/runner/.local/bin to the path
+checks	UNKNOWN STEP	2026-11-12T08:39:39.2528587Z Added /opt/hostedtoolcache/uv/0.12.23/x86_64 to the path
+checks	UNKNOWN STEP	2026-11-12T08:39:39.2529321Z Set UV_PYTHON_INSTALL_DIR to /home/runner/work/_temp/uv-python-dir
+checks	UNKNOWN STEP	2026-11-12T08:39:39.2529712Z Added /home/runner/work/_temp/uv-python-dir to the path
+checks	UNKNOWN STEP	2026-11-12T08:39:39.2530305Z Set UV_PYTHON to 3.12
+checks	UNKNOWN STEP	2026-11-12T08:39:39.2550800Z Set UV_CACHE_DIR to /home/runner/work/_temp/setup-uv-cache
+checks	UNKNOWN STEP	2026-11-12T08:39:39.2551374Z Successfully installed uv version 0.12.23
+checks	UNKNOWN STEP	2026-11-12T08:39:39.2555392Z Searching files using cache dependency glob: /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/**/*requirements*.txt,/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/**/*requirements*.in,/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/**/*constraints*.txt,/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/**/*constraints*.in,/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/**/pyproject.toml,/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/**/uv.lock,/home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/**/*.py.lock
+checks	UNKNOWN STEP	2026-11-12T08:39:39.3043439Z /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/pyproject.toml
+checks	UNKNOWN STEP	2026-11-12T08:39:39.3127107Z /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/uv.lock
+checks	UNKNOWN STEP	2026-11-12T08:39:39.3136958Z Found 2 files to hash.
+checks	UNKNOWN STEP	2026-11-12T08:39:39.3217986Z Trying to restore cache from GitHub Actions cache with key: setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12-9f6188d9f5cacd62cbd69e3befaed4d7bd2963cd67beff941ec1e7962d396a70
+checks	UNKNOWN STEP	2026-11-12T08:39:39.4454573Z Cache hit for: setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12-9f6188d9f5cacd62cbd69e3befaed4d7bd2963cd67beff941ec1e7962d396a70
+checks	UNKNOWN STEP	2026-11-12T08:39:40.5935637Z Received 121634816 of 186677629 (65.2%), 116.0 MBs/sec
+checks	UNKNOWN STEP	2026-11-12T08:39:41.0224939Z Received 186677629 of 186677629 (100.0%), 124.6 MBs/sec
+checks	UNKNOWN STEP	2026-11-12T08:39:41.0225640Z Cache Size: ~178 MB (186677629 B)
+checks	UNKNOWN STEP	2026-11-12T08:39:41.0252526Z [command]/usr/bin/tar -xf /home/runner/work/_temp/7ac85550-ab49-4517-908c-b58d1a613546/cache.tzst -P -C /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand --use-compress-program unzstd
+checks	UNKNOWN STEP	2026-11-12T08:39:42.5153491Z Cache restored successfully
+checks	UNKNOWN STEP	2026-11-12T08:39:42.5242313Z cache restored from GitHub Actions cache with key: setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12-9f6188d9f5cacd62cbd69e3befaed4d7bd2963cd67beff941ec1e7962d396a70
+checks	UNKNOWN STEP	2026-11-12T08:39:42.8564323Z ##[group]Run uv lock --check
+checks	UNKNOWN STEP	2026-11-12T08:39:42.8564602Z ^[[36;1muv lock --check^[[0m
+checks	UNKNOWN STEP	2026-11-12T08:39:42.8585450Z shell: /usr/bin/bash -e {0}
+checks	UNKNOWN STEP	2026-11-12T08:39:42.8585628Z env:
+checks	UNKNOWN STEP	2026-11-12T08:39:42.8585815Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+checks	UNKNOWN STEP	2026-11-12T08:39:42.8586136Z   UV_PYTHON: 3.12
+checks	UNKNOWN STEP	2026-11-12T08:39:42.8586319Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+checks	UNKNOWN STEP	2026-11-12T08:39:42.8586545Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:42.8766266Z Using CPython 3.12.3 interpreter at: /usr/bin/python3.12
+checks	UNKNOWN STEP	2026-11-12T08:39:42.8789615Z Resolved 100 packages in 0.86ms
+checks	UNKNOWN STEP	2026-11-12T08:39:42.9354540Z ##[group]Run uv sync --locked
+checks	UNKNOWN STEP	2026-11-12T08:39:42.9354758Z ^[[36;1muv sync --locked^[[0m
+checks	UNKNOWN STEP	2026-11-12T08:39:42.9372127Z shell: /usr/bin/bash -e {0}
+checks	UNKNOWN STEP	2026-11-12T08:39:42.9372296Z env:
+checks	UNKNOWN STEP	2026-11-12T08:39:42.9372475Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+checks	UNKNOWN STEP	2026-11-12T08:39:42.9372675Z   UV_PYTHON: 3.12
+checks	UNKNOWN STEP	2026-11-12T08:39:42.9372826Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+checks	UNKNOWN STEP	2026-11-12T08:39:42.9373004Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:42.9739142Z Using CPython 3.12.3 interpreter at: /usr/bin/python3.12
+checks	UNKNOWN STEP	2026-11-12T08:39:42.9739840Z Creating virtual environment at: .venv
+checks	UNKNOWN STEP	2026-11-12T08:39:42.9762501Z Resolved 100 packages in 0.87ms
+checks	UNKNOWN STEP	2026-11-12T08:39:43.0440484Z    Building bike-demand @ file:///home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand
+checks	UNKNOWN STEP	2026-11-12T08:39:43.1951589Z       Built bike-demand @ file:///home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand
+checks	UNKNOWN STEP	2026-11-12T08:39:43.1963305Z Prepared 1 package in 216ms
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4488282Z Installed 97 packages in 2.25s
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4489105Z  + aiohappyeyeballs==2.7.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4489471Z  + aiohttp==3.14.4
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4489793Z  + aiosignal==1.4.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4490101Z  + alembic==1.20.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4490638Z  + annotated-doc==0.0.5
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4490980Z  + annotated-types==0.8.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4491363Z  + anyio==4.15.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4491668Z  + attrs==26.1.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4492230Z  + bike-demand==0.1.0 (from file:///home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand)
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4492862Z  + blinker==1.9.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4493204Z  + cachetools==7.2.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4493526Z  + certifi==2026.7.22
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4493840Z  + cffi==2.1.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4494158Z  + charset-normalizer==3.5.2
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4494499Z  + click==8.5.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4494814Z  + cloudpickle==3.1.2
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4495132Z  + contourpy==1.4.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4495472Z  + cryptography==50.0.2
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4495803Z  + cycler==0.12.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4496247Z  + databricks-sdk==0.148.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4496577Z  + docker==7.2.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4496884Z  + fastapi==0.142.2
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4497191Z  + flask==3.1.3
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4497491Z  + flask-cors==6.0.5
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4497800Z  + fonttools==4.66.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4498115Z  + frozenlist==1.8.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4498424Z  + gitdb==4.0.12
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4498730Z  + gitpython==3.2.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4499042Z  + google-auth==2.60.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4499362Z  + graphene==3.4.3
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4499676Z  + graphql-core==3.2.13
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4500015Z  + graphql-relay==3.2.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4500342Z  + gunicorn==26.2.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4500656Z  + h11==0.16.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4500959Z  + httpcore==1.0.9
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4501263Z  + httpx==0.28.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4501568Z  + huey==3.4.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4501867Z  + idna==3.20
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4502197Z  + importlib-metadata==9.0.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4502544Z  + iniconfig==2.3.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4502863Z  + itsdangerous==2.2.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4503181Z  + jinja2==3.1.6
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4503486Z  + joblib==1.6.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4503793Z  + kiwisolver==1.5.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4504107Z  + mako==1.4.3
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4504408Z  + markupsafe==3.0.4
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4504723Z  + matplotlib==3.11.2
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4505027Z  + mlflow==3.17.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4505366Z  + mlflow-skinny==3.17.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4505694Z  + mlflow-tracing==3.17.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4506120Z  + multidict==6.9.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4506421Z  + narwhals==2.26.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4506721Z  + numpy==2.5.3
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4507023Z  + opentelemetry-api==1.45.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4507362Z  + opentelemetry-proto==1.45.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4507716Z  + opentelemetry-sdk==1.45.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4508080Z  + opentelemetry-semantic-conventions==0.66b1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4508463Z  + packaging==26.3
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4509140Z  + pandas==2.3.3
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4509480Z  + pillow==12.3.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4509786Z  + pluggy==1.6.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4510097Z  + prettytable==3.18.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4510432Z  + propcache==0.5.4
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4510756Z  + protobuf==6.33.6
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4511069Z  + pyarrow==25.0.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4511384Z  + pyasn1==0.6.4
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4511697Z  + pyasn1-modules==0.4.2
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4512038Z  + pycparser==3.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4512350Z  + pydantic==2.13.5
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4512695Z  + pydantic-core==2.46.5
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4513026Z  + pygments==2.21.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4513339Z  + pyparsing==3.3.3
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4513651Z  + pytest==9.1.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4513968Z  + python-dateutil==2.9.0.post0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4514320Z  + python-dotenv==1.2.4
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4514645Z  + pytz==2026.5
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4514954Z  + pyyaml==6.0.3
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4515270Z  + requests==2.34.2
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4515819Z  + ruff==0.15.7
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4516353Z  + scikit-learn==1.9.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4516673Z  + scipy==1.18.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4516975Z  + six==1.17.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4517283Z  + skops==0.16.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4517585Z  + smmap==5.0.3
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4517901Z  + sqlalchemy==2.1.3
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4518221Z  + sqlparse==0.6.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4518568Z  + starlette==1.7.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4518887Z  + threadpoolctl==3.7.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4519229Z  + typing-extensions==4.16.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4519592Z  + typing-inspection==0.4.4
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4519934Z  + tzdata==2026.5
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4520232Z  + urllib3==2.8.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4520535Z  + uvicorn==0.54.0
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4520851Z  + wcwidth==0.9.2
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4521151Z  + werkzeug==3.1.9
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4521464Z  + yarl==1.25.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4521773Z  + zipp==4.1.1
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4585015Z ##[group]Run uv run --locked ruff check .
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4585244Z ^[[36;1muv run --locked ruff check .^[[0m
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4602822Z shell: /usr/bin/bash -e {0}
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4602970Z env:
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4603139Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4603330Z   UV_PYTHON: 3.12
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4603488Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4603661Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4879350Z All checks passed!
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4932452Z ##[group]Run uv run --locked ruff format --check .
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4932712Z ^[[36;1muv run --locked ruff format --check .^[[0m
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4950002Z shell: /usr/bin/bash -e {0}
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4950148Z env:
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4950310Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4950504Z   UV_PYTHON: 3.12
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4950652Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+checks	UNKNOWN STEP	2026-11-12T08:39:45.4950827Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:45.5197349Z 16 files already formatted
+checks	UNKNOWN STEP	2026-11-12T08:39:45.5242141Z ##[group]Run uv run --locked python -m bike_demand.preflight
+checks	UNKNOWN STEP	2026-11-12T08:39:45.5242434Z ^[[36;1muv run --locked python -m bike_demand.preflight^[[0m
+checks	UNKNOWN STEP	2026-11-12T08:39:45.5259731Z shell: /usr/bin/bash -e {0}
+checks	UNKNOWN STEP	2026-11-12T08:39:45.5259888Z env:
+checks	UNKNOWN STEP	2026-11-12T08:39:45.5260053Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+checks	UNKNOWN STEP	2026-11-12T08:39:45.5260243Z   UV_PYTHON: 3.12
+checks	UNKNOWN STEP	2026-11-12T08:39:45.5260393Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+checks	UNKNOWN STEP	2026-11-12T08:39:45.5260574Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:50.0361295Z Preflight passed: imports, frozen snapshot and writable outputs.
+checks	UNKNOWN STEP	2026-11-12T08:39:50.0362067Z This does not complete exercises, verify GitHub CI, or certify other OSes.
+checks	UNKNOWN STEP	2026-11-12T08:39:50.5965874Z ##[group]Run uv run --locked pytest -q -m infra
+checks	UNKNOWN STEP	2026-11-12T08:39:50.5966383Z ^[[36;1muv run --locked pytest -q -m infra^[[0m
+checks	UNKNOWN STEP	2026-11-12T08:39:50.5982820Z shell: /usr/bin/bash -e {0}
+checks	UNKNOWN STEP	2026-11-12T08:39:50.5982966Z env:
+checks	UNKNOWN STEP	2026-11-12T08:39:50.5983128Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+checks	UNKNOWN STEP	2026-11-12T08:39:50.5983344Z   UV_PYTHON: 3.12
+checks	UNKNOWN STEP	2026-11-12T08:39:50.5983496Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+checks	UNKNOWN STEP	2026-11-12T08:39:50.5983670Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0467434Z .........                                                                [100%]
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0468264Z =============================== warnings summary ===============================
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0469107Z .venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0479533Z   /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0480819Z     from starlette.testclient import TestClient as TestClient  # noqa
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0481225Z 
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0481574Z tests/infra/test_infrastructure.py::test_tracking_readback_and_history
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0483045Z   /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.venv/lib/python3.12/site-packages/mlflow/store/tracking/sqlalchemy_store.py:327: SADeprecationWarning: The ``noload`` loader strategy is deprecated and will be removed in a future release.  This option produces incorrect results by returning ``None`` for related items. (deprecated since: 2.1)
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0485181Z     sqlalchemy.orm.configure_mappers()
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0489505Z 
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0490071Z -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+checks	UNKNOWN STEP	2026-11-12T08:39:58.0490617Z 9 passed, 108 deselected, 2 warnings in 6.72s
+checks	UNKNOWN STEP	2026-11-12T08:39:59.0739696Z ##[group]Run uv run --locked pytest -q -m "not infra"
+checks	UNKNOWN STEP	2026-11-12T08:39:59.0740106Z ^[[36;1muv run --locked pytest -q -m "not infra"^[[0m
+checks	UNKNOWN STEP	2026-11-12T08:39:59.0762761Z shell: /usr/bin/bash -e {0}
+checks	UNKNOWN STEP	2026-11-12T08:39:59.0763025Z env:
+checks	UNKNOWN STEP	2026-11-12T08:39:59.0763335Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+checks	UNKNOWN STEP	2026-11-12T08:39:59.0763712Z   UV_PYTHON: 3.12
+checks	UNKNOWN STEP	2026-11-12T08:39:59.0764028Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+checks	UNKNOWN STEP	2026-11-12T08:39:59.0764354Z ##[endgroup]
+checks	UNKNOWN STEP	2026-11-12T08:40:03.4273639Z ........................................................................ [ 66%]
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1688975Z ........xxxxxxxxxxxx................                                     [100%]
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1698304Z =============================== warnings summary ===============================
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1698819Z .venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1699962Z   /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1701041Z     from starlette.testclient import TestClient as TestClient  # noqa
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1701372Z 
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1701693Z tests/exercise/test_baseline.py::test_saved_model_readback_rerun_and_held_test
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1703146Z   /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand/.venv/lib/python3.12/site-packages/mlflow/store/tracking/sqlalchemy_store.py:327: SADeprecationWarning: The ``noload`` loader strategy is deprecated and will be removed in a future release.  This option produces incorrect results by returning ``None`` for related items. (deprecated since: 2.1)
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1704502Z     sqlalchemy.orm.configure_mappers()
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1704763Z 
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1705042Z -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+checks	UNKNOWN STEP	2026-11-12T08:40:04.1705519Z 96 passed, 9 deselected, 12 xfailed, 2 warnings in 4.52s
+checks	UNKNOWN STEP	2026-11-12T08:40:05.1633051Z Post job cleanup.
+checks	UNKNOWN STEP	2026-11-12T08:40:05.2494358Z UV_CACHE_DIR is already set to /home/runner/work/_temp/setup-uv-cache
+checks	UNKNOWN STEP	2026-11-12T08:40:05.2498391Z UV_PYTHON_INSTALL_DIR is already set to /home/runner/work/_temp/uv-python-dir
+checks	UNKNOWN STEP	2026-11-12T08:40:05.2499307Z Cache hit occurred on key setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12-9f6188d9f5cacd62cbd69e3befaed4d7bd2963cd67beff941ec1e7962d396a70, not saving cache.
+checks	UNKNOWN STEP	2026-11-12T08:40:05.3672825Z Post job cleanup.
+checks	UNKNOWN STEP	2026-11-12T08:40:05.4423447Z [command]/usr/bin/git version
+checks	UNKNOWN STEP	2026-11-12T08:40:05.4498737Z git version 2.56.0
+checks	UNKNOWN STEP	2026-11-12T08:40:05.4548230Z Temporarily overriding HOME='/home/runner/work/_temp/0957466e-35b8-44c2-83a3-acba1660e978' before making global git config changes
+checks	UNKNOWN STEP	2026-11-12T08:40:05.4557855Z Adding repository directory to the temporary git global config as a safe directory
+checks	UNKNOWN STEP	2026-11-12T08:40:05.4558677Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mlops-thu1-BDGV-bike-demand/mlops-thu1-BDGV-bike-demand
+checks	UNKNOWN STEP	2026-11-12T08:40:05.4661340Z Removing SSH command configuration
+checks	UNKNOWN STEP	2026-11-12T08:40:05.4678930Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+checks	UNKNOWN STEP	2026-11-12T08:40:05.4688059Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+checks	UNKNOWN STEP	2026-11-12T08:40:05.5077157Z Removing HTTP extra header
+checks	UNKNOWN STEP	2026-11-12T08:40:05.5077800Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+checks	UNKNOWN STEP	2026-11-12T08:40:05.5129472Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+checks	UNKNOWN STEP	2026-11-12T08:40:05.5636931Z Removing includeIf entries pointing to credentials config files
+checks	UNKNOWN STEP	2026-11-12T08:40:05.5637506Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+checks	UNKNOWN STEP	2026-11-12T08:40:05.5779832Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+checks	UNKNOWN STEP	2026-11-12T08:40:05.6541722Z Cleaning up orphan processes
