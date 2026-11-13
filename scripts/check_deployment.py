@@ -3,6 +3,10 @@
 
 Expected identity comes from the local model artifact and the checked-out Git
 revision. Observed identity comes only from HTTP responses from the container.
+
+For a private Cloud Run service, put an ID token for the service in the
+CHECK_ID_TOKEN environment variable: it is sent as a Bearer token and never
+printed. Leave it unset for a local container.
 """
 
 from __future__ import annotations
@@ -11,13 +15,13 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import subprocess
 import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
-
 
 VALID_REQUEST = {
     "season": 1,
@@ -36,10 +40,18 @@ VALID_REQUEST = {
 
 
 def _http(
-    base_url: str, path: str, *, method: str = "GET", payload: Any = None, timeout: float
+    base_url: str,
+    path: str,
+    *,
+    method: str = "GET",
+    payload: Any = None,
+    timeout: float,
+    token: str | None = None,
 ) -> tuple[int | None, Any]:
     data = None if payload is None else json.dumps(payload).encode("utf-8")
     headers = {"Accept": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
     if data is not None:
         headers["Content-Type"] = "application/json"
     request = urllib.request.Request(
@@ -126,15 +138,24 @@ def main() -> int:
         expected_version, expected_model_sha, expected_git_sha = _load_expected(
             args.model_dir, repo_root, args.git_sha
         )
-    except (OSError, ValueError, json.JSONDecodeError, subprocess.SubprocessError) as error:
+    except (
+        OSError,
+        ValueError,
+        json.JSONDecodeError,
+        subprocess.SubprocessError,
+    ) as error:
         parser.exit(2, f"Cannot load independent expected identity: {error}\n")
 
+    # From the environment, not a flag: a token must not appear in a command line.
+    token = os.environ.get("CHECK_ID_TOKEN") or None
     rows: list[tuple[str, str, str, bool]] = []
 
     def add(claim: str, expected: Any, observed: Any, passed: bool) -> None:
         rows.append((claim, _display(expected), _display(observed), passed))
 
-    health_status, health = _http(args.base_url, "/health", timeout=args.timeout)
+    health_status, health = _http(
+        args.base_url, "/health", timeout=args.timeout, token=token
+    )
     add("/health HTTP status", 200, health_status, health_status == 200)
     if isinstance(health, dict):
         observed_version = health.get("model_version")
@@ -162,11 +183,10 @@ def main() -> int:
         method="POST",
         payload=VALID_REQUEST,
         timeout=args.timeout,
+        token=token,
     )
     prediction = (
-        prediction_body.get("prediction")
-        if isinstance(prediction_body, dict)
-        else None
+        prediction_body.get("prediction") if isinstance(prediction_body, dict) else None
     )
     if isinstance(prediction, (int, float)) and not isinstance(prediction, bool):
         finite_nonnegative = math.isfinite(prediction) and prediction >= 0
@@ -187,14 +207,12 @@ def main() -> int:
         method="POST",
         payload=invalid_request,
         timeout=args.timeout,
+        token=token,
     )
     add("invalid /predict status (hr=24)", 422, invalid_status, invalid_status == 422)
 
     headers = ("claim", "expected", "observed", "result")
-    widths = [
-        max(len(headers[i]), *(len(row[i]) for row in rows))
-        for i in range(3)
-    ]
+    widths = [max(len(headers[i]), *(len(row[i]) for row in rows)) for i in range(3)]
     print(" | ".join(headers[i].ljust(widths[i]) for i in range(3)) + " | result")
     print("-+-".join("-" * width for width in widths) + "-+--------")
     for claim, expected, observed, passed in rows:
