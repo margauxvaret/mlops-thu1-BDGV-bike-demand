@@ -3,6 +3,10 @@
 
 Expected identity comes from the local model artifact and the checked-out Git
 revision. Observed identity comes only from HTTP responses from the container.
+
+For a private Cloud Run service, put an ID token for the service in the
+CHECK_ID_TOKEN environment variable: it is sent as a Bearer token and never
+printed. Leave it unset for a local container.
 """
 
 from __future__ import annotations
@@ -11,6 +15,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import subprocess
 import sys
 import urllib.error
@@ -41,9 +46,12 @@ def _http(
     method: str = "GET",
     payload: Any = None,
     timeout: float,
+    token: str | None = None,
 ) -> tuple[int | None, Any]:
     data = None if payload is None else json.dumps(payload).encode("utf-8")
     headers = {"Accept": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
     if data is not None:
         headers["Content-Type"] = "application/json"
     request = urllib.request.Request(
@@ -138,12 +146,16 @@ def main() -> int:
     ) as error:
         parser.exit(2, f"Cannot load independent expected identity: {error}\n")
 
+    # From the environment, not a flag: a token must not appear in a command line.
+    token = os.environ.get("CHECK_ID_TOKEN") or None
     rows: list[tuple[str, str, str, bool]] = []
 
     def add(claim: str, expected: Any, observed: Any, passed: bool) -> None:
         rows.append((claim, _display(expected), _display(observed), passed))
 
-    health_status, health = _http(args.base_url, "/health", timeout=args.timeout)
+    health_status, health = _http(
+        args.base_url, "/health", timeout=args.timeout, token=token
+    )
     add("/health HTTP status", 200, health_status, health_status == 200)
     if isinstance(health, dict):
         observed_version = health.get("model_version")
@@ -171,6 +183,7 @@ def main() -> int:
         method="POST",
         payload=VALID_REQUEST,
         timeout=args.timeout,
+        token=token,
     )
     prediction = (
         prediction_body.get("prediction") if isinstance(prediction_body, dict) else None
@@ -194,6 +207,7 @@ def main() -> int:
         method="POST",
         payload=invalid_request,
         timeout=args.timeout,
+        token=token,
     )
     add("invalid /predict status (hr=24)", 422, invalid_status, invalid_status == 422)
 

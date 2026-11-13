@@ -40,3 +40,241 @@ jobs:
         run: uv run --locked pytest -q -m infra
       - name: All other tests (lab1, exercise, API)
         run: uv run --locked pytest -q -m "not infra"
+
+  image:
+    name: API image, built from this commit and checked from outside
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      # The repository tracks both DockerFile and Dockerfile: name the API one.
+      # On a pull request GITHUB_SHA is the test merge commit that was checked
+      # out, so the image and the check below name the same commit.
+      - name: Build the API image
+        run: |
+          docker build --progress=plain -f Dockerfile \
+            --build-arg GIT_SHA="$GITHUB_SHA" -t bdgv-api:ci .
+
+      # artifacts/ is not in Git, so the runner has no model: start without one.
+      - name: Start the container without a model
+        run: docker run -d --name api -p 127.0.0.1:8000:8000 bdgv-api:ci
+
+      - name: Check it from outside (commit, missing model, input validation)
+        run: |
+          set -euo pipefail
+          url=http://127.0.0.1:8000
+          expect() {
+            if [ "$2" != "$3" ]; then
+              echo "FAIL  $1: expected $2, observed $3"
+              exit 1
+            fi
+            echo "PASS  $1: $3"
+          }
+          # Wait until the port answers (any HTTP status), at most 30 s.
+          for _ in $(seq 30); do
+            curl -s -o /dev/null "$url/health" && break
+            sleep 1
+          done
+          code=$(curl -sS -o health.json -w '%{http_code}' "$url/health")
+          cat health.json
+          echo
+          expect "/health status without a model" 503 "$code"
+          expect "/health status field" unavailable "$(jq -r .status health.json)"
+          expect "git_sha" "$GITHUB_SHA" "$(jq -r .git_sha health.json)"
+          valid='{"season":1,"yr":0,"mnth":1,"hr":12,"holiday":0,"weekday":1,"workingday":1,"weathersit":1,"temp":0.24,"atemp":0.2879,"hum":0.81,"windspeed":0.0}'
+          invalid=$(jq -c '.hr = 24' <<<"$valid")
+          code=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H 'Content-Type: application/json' -d "$valid" "$url/predict")
+          expect "valid /predict without a model" 503 "$code"
+          code=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H 'Content-Type: application/json' -d "$invalid" "$url/predict")
+          expect "invalid /predict (hr=24)" 422 "$code"
+
+      - name: Container logs
+        if: always()
+        run: docker logs api
+
+  deploy:
+    name: Deploy to Cloud Run (main only, every check green)
+    # Every check job: deploy starts only when all of them are green.
+    needs: [checks, image]
+    # success() of every job in needs is implied by this condition.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      id-token: write # keyless login to Google Cloud, for this job only
+    # Never cancel a deploy halfway. Person 1: if the workflow has its own
+    # concurrency, cancel only pull request runs:
+    #   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    concurrency:
+      group: deploy-cloud-run
+      cancel-in-progress: false
+    env:
+      # Names and addresses only, no secret. Must match gcp-setup.sh.
+      # Project ID read from the image URL in the Cloud Run console: confirm it.
+      PROJECT_ID: mlops-ece-group2
+      REGION: europe-west1
+      SERVICE: mlops-thu1-bdgv-bike-demand
+      SERVICE_URL: https://mlops-thu1-bdgv-bike-demand-1087566946792.europe-west1.run.app
+      IMAGE: europe-west1-docker.pkg.dev/mlops-ece-group2/cloud-run-source-deploy/bdgv-api
+      MODEL_BUCKET: mlops-ece-group2-bdgv-models
+      RUNTIME_SA: bdgv-api-runtime@mlops-ece-group2.iam.gserviceaccount.com
+      DEPLOY_SA: bdgv-deployer@mlops-ece-group2.iam.gserviceaccount.com
+      WIF_PROVIDER: projects/1087566946792/locations/global/workloadIdentityPools/bdgv-github/providers/bdgv-main
+      EVIDENCE: deploy-evidence
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      # Build before logging in: no credential file exists yet in the build
+      # context. Rebuilt from the same commit and lock as the image job.
+      - name: Build the API image from this commit
+        run: |
+          docker build --progress=plain -f Dockerfile \
+            --build-arg GIT_SHA="$GITHUB_SHA" -t "$IMAGE:$GITHUB_SHA" .
+
+      - name: Log in to Google Cloud without a stored key
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+        with:
+          version: "570.0.0"
+          project_id: ${{ env.PROJECT_ID }}
+
+      # Expected identity, independent of the service: the model files must
+      # match the SHA-256 values committed in deploy/model.sha256.
+      - name: Get the expected model and check it against the committed record
+        run: |
+          mkdir -p artifacts
+          gcloud storage cp "gs://$MODEL_BUCKET/model.joblib" \
+            "gs://$MODEL_BUCKET/model-metadata.json" artifacts/
+          sha256sum -c deploy/model.sha256
+
+      - name: Push the image
+        id: push
+        run: |
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          docker push "$IMAGE:$GITHUB_SHA"
+          digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE:$GITHUB_SHA")
+          echo "image=$digest" >> "$GITHUB_OUTPUT"
+          echo "pushed: $digest"
+
+      - name: Record the revision serving traffic now (rollback target)
+        id: before
+        run: |
+          previous=$(gcloud run services describe "$SERVICE" --region "$REGION" \
+            --format 'value(status.traffic[0].revisionName)' 2>/dev/null || true)
+          echo "revision=$previous" >> "$GITHUB_OUTPUT"
+          echo "previous revision: ${previous:-none, first deploy}"
+
+      # Deploy by digest: a tag can move, a digest cannot. The model bucket is
+      # mounted read-only on /models (the image's MODEL_DIR), as in Lab 4.
+      # GIT_SHA is never set here: it comes from the image. Who may call the
+      # service (public or not) is not changed: it stays as set in the console.
+      - name: Deploy a new revision
+        id: deploy
+        env:
+          IMAGE_REF: ${{ steps.push.outputs.image }}
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --image "$IMAGE_REF" \
+            --region "$REGION" \
+            --service-account "$RUNTIME_SA" \
+            --port 8000 \
+            --execution-environment gen2 \
+            --add-volume name=models,type=cloud-storage,bucket="$MODEL_BUCKET",readonly=true \
+            --add-volume-mount volume=models,mount-path=/models \
+            --min-instances 0 \
+            --max-instances 1 \
+            --quiet
+
+      # After a rollback, traffic stays pinned to the old revision and a new
+      # deploy gets 0 %: send everything to the revision just deployed.
+      - name: Send all traffic to the new revision
+        run: gcloud run services update-traffic "$SERVICE" --region "$REGION" --to-latest --quiet
+
+      - name: Record what is now live
+        env:
+          IMAGE_REF: ${{ steps.push.outputs.image }}
+          PREVIOUS: ${{ steps.before.outputs.revision }}
+        run: |
+          mkdir -p "$EVIDENCE"
+          revision=$(gcloud run services describe "$SERVICE" --region "$REGION" \
+            --format 'value(status.latestReadyRevisionName)')
+          {
+            echo "commit:            $GITHUB_SHA"
+            echo "image:             $IMAGE_REF"
+            echo "previous revision: ${PREVIOUS:-none}"
+            echo "new revision:      $revision"
+            echo "url:               $SERVICE_URL"
+            echo "run:               $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "traffic:"
+            gcloud run services describe "$SERVICE" --region "$REGION" --format 'yaml(status.traffic)'
+          } | tee "$EVIDENCE/deploy-record.txt"
+          cat "$EVIDENCE/deploy-record.txt" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4
+        with:
+          version: "0.12.23"
+          python-version: "3.12"
+
+      # The service is private (403 without a token). Ask Google for a
+      # short-lived ID token for this service, as the deploy account (which has
+      # run.invoker on it). The action masks the token in the logs.
+      - name: Get an ID token to call the private service
+        id: idtoken
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+          token_format: id_token
+          id_token_audience: ${{ env.SERVICE_URL }}
+          id_token_include_email: true
+          create_credentials_file: false
+          export_environment_variables: false
+
+      # Same checker as Lab 5. Expected model: artifacts/ checked above;
+      # expected commit: git rev-parse HEAD, the commit of this run.
+      # --timeout 30: the first request after scale-to-zero waits for a cold start.
+      - name: Check the live service (Lab 5 identity check)
+        env:
+          CHECK_ID_TOKEN: ${{ steps.idtoken.outputs.id_token }}
+        run: |
+          set -o pipefail
+          uv run --locked python scripts/check_deployment.py \
+            --base-url "$SERVICE_URL" --model-dir artifacts --timeout 30 \
+            | tee "$EVIDENCE/live-check.txt"
+
+      - name: Roll back to the previous revision
+        if: >-
+          failure() && steps.before.outputs.revision != '' &&
+          (steps.deploy.outcome == 'success' || steps.deploy.outcome == 'failure')
+        env:
+          PREVIOUS: ${{ steps.before.outputs.revision }}
+        run: |
+          mkdir -p "$EVIDENCE"
+          gcloud run services update-traffic "$SERVICE" --region "$REGION" \
+            --to-revisions "$PREVIOUS=100" --quiet
+          gcloud run services describe "$SERVICE" --region "$REGION" \
+            --format 'yaml(status.traffic)' | tee "$EVIDENCE/rollback.txt"
+
+      # Run records expire: download this artifact and commit its files under
+      # reports/evidence/lab6/ in a reviewed PR.
+      - name: Keep the evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: deploy-evidence-${{ github.sha }}
+          path: deploy-evidence/
+          if-no-files-found: warn
