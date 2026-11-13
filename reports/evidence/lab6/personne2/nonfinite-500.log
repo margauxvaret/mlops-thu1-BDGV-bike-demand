@@ -1,0 +1,37 @@
+Mutation: @app.exception_handler(RequestValidationError) -> @app.exception_handler(RuntimeError)
+Commande: python -m pytest -q tests/test_api.py::test_non_finite[nan-temp]
+Code de sortie: 1
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________________________ test_non_finite[nan-temp] __________________________
+
+client = <starlette.testclient.TestClient object at 0x0000020BDC510590>
+field = 'temp', value = nan
+
+    @pytest.mark.parametrize("field", ["temp", "atemp", "hum", "windspeed"])
+    @pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
+    def test_non_finite(client, field, value):
+>       assert post_raw(client, {**VALID, field: value}).status_code == 422
+E       AssertionError: assert 500 == 422
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+E        +    where <Response [500 Internal Server Error]> = post_raw(<starlette.testclient.TestClient object at 0x0000020BDC510590>, {'season': 1, 'yr': 0, 'mnth': 6, 'hr': 12, ...})
+
+tests\test_api.py:167: AssertionError
+---------------------------- Captured stdout setup ----------------------------
+{"ts": "2026-11-12T10:25:57.939+00:00", "level": "INFO", "event": "model_loaded", "model_dir": "C:\\Users\\victo\\AppData\\Local\\Temp\\pytest-of-victo\\pytest-4\\test_non_finite_nan_temp_0\\model", "model_version": "test-0.0.1", "model_sha256": "398c67f9cf0b508594ac251597c40370067b26aa872e50a497a0cd638dead411", "git_sha": "unknown"}
+----------------------------- Captured log setup ------------------------------
+INFO     bike_demand.api:request_logging.py:80 model_loaded
+---------------------------- Captured stdout call -----------------------------
+{"ts": "2026-11-12T10:25:57.977+00:00", "level": "ERROR", "event": "failed", "request_id": "f594fe7d8e66", "method": "POST", "path": "/predict", "status": 500, "ms": 2.8, "model_version": "test-0.0.1", "error": "ValueError", "error_at": "encoder.py:258"}
+------------------------------ Captured log call ------------------------------
+ERROR    bike_demand.api:request_logging.py:80 failed
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\victo\OneDrive\Documents\ChatGPT\victor\mlops-thu1-BDGV-bike-demand-lab6-ci-workflow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_api.py::test_non_finite[nan-temp] - AssertionError: assert ...
+1 failed, 1 warning in 5.38s

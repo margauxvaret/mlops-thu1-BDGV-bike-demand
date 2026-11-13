@@ -1,0 +1,42 @@
+Mutation: prediction = float(model.predict(row)[0]) -> prediction = float(model.predict(row)[0]) + 1
+Commande: python -m pytest -q tests/test_api.py::test_prediction_matches_saved_model_readback
+Code de sortie: 1
+
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ test_prediction_matches_saved_model_readback _________________
+
+client = <starlette.testclient.TestClient object at 0x00000151F6C745F0>
+model_dir = WindowsPath('C:/Users/victo/AppData/Local/Temp/pytest-of-victo/pytest-3/test_prediction_matches_saved_0/model')
+
+    def test_prediction_matches_saved_model_readback(client, model_dir):
+        # Recompute from the earlier serialized fixture, not from a second training run.
+        model = joblib.load(model_dir / "model.joblib")
+        recorded = float(model.predict(pd.DataFrame([VALID], columns=FEATURES))[0])
+        response = client.post("/predict", json=VALID)
+        assert response.status_code == 200
+>       assert response.json()["prediction"] == pytest.approx(recorded, rel=0, abs=0)
+E       assert 43.0 == 42.0 � 0.0e+00
+E         
+E         comparison failed
+E         Obtained: 43.0
+E         Expected: 42.0 � 0.0e+00
+
+tests\test_api.py:222: AssertionError
+---------------------------- Captured stdout setup ----------------------------
+{"ts": "2026-11-12T10:25:50.358+00:00", "level": "INFO", "event": "model_loaded", "model_dir": "C:\\Users\\victo\\AppData\\Local\\Temp\\pytest-of-victo\\pytest-3\\test_prediction_matches_saved_0\\model", "model_version": "test-0.0.1", "model_sha256": "398c67f9cf0b508594ac251597c40370067b26aa872e50a497a0cd638dead411", "git_sha": "unknown"}
+----------------------------- Captured log setup ------------------------------
+INFO     bike_demand.api:request_logging.py:80 model_loaded
+---------------------------- Captured stdout call -----------------------------
+{"ts": "2026-11-12T10:25:50.367+00:00", "level": "INFO", "event": "served", "request_id": "6ae786646c05", "method": "POST", "path": "/predict", "status": 200, "ms": 4.6, "model_version": "test-0.0.1"}
+------------------------------ Captured log call ------------------------------
+INFO     bike_demand.api:request_logging.py:80 served
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\victo\OneDrive\Documents\ChatGPT\victor\mlops-thu1-BDGV-bike-demand-lab6-ci-workflow\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_api.py::test_prediction_matches_saved_model_readback - asse...
+1 failed, 1 warning in 5.38s

@@ -613,3 +613,32 @@ is a real failure, fixed by committing `pyproject.toml` and `uv.lock` together.
 - **Rejected option:** relying on the GitHub Actions history and the Cloud Run console.
 - **Why:** both live outside the repository and change or expire. The tag plus
   the committed files freeze what was checked and when.
+
+### Lab 6 — Tests (Person 2)
+
+#### Defects: which faults do the tests target?
+- **Choice:** test named observable faults: `hr=24` is accepted, `/health` loses an identity field, a model with an incorrect SHA is loaded, the API prediction changes relative to the saved model, and non-finite inputs produce 500 instead of 422. Existing boundary tests cover further invalid values.
+- **Rejected:** checking only successful HTTP responses.
+- **Why:** each assertion identifies a contract violation. The non-finite regression required fixing validation-error serialization; the old expected-failure markers have been removed.
+
+#### Failing: how do we know the tests can fail?
+- **Choice:** temporarily introduce one defect at a time, run its targeted test, restore the source, and retain the output under `reports/evidence/lab6/personne2/`.
+- **Rejected:** assume a green test would catch the defect.
+- **Why:** the five `*.log` files named after mutations show the exact mutation, test, nonzero exit and assertion failure. These are local mutation experiments, not CI run or pull-request evidence.
+
+#### Tolerance: where does the threshold come from?
+- **Choice:** compare the API prediction with a fresh prediction from the earlier serialized `DummyRegressor` using zero absolute and relative tolerance. Five repeated readbacks and API calls measured 42.0 on both sides and a maximum difference of 0.0; see `measurement.log` and `measure_prediction.py`.
+- **Rejected:** a generous arbitrary tolerance or comparing two newly trained models.
+- **Why:** the fixture returns a deterministic constant; exact equality detects a changed response. This local measurement is specific to this fixture and environment, not evidence of numerical stability of a real model on every platform.
+
+To reproduce, from the repository root after `uv sync --locked`:
+
+```powershell
+uv run --locked pytest -q tests/test_api.py
+uv run --locked python reports/evidence/lab6/personne2/measure_prediction.py
+```
+
+```bash
+uv run --locked pytest -q tests/test_api.py
+uv run --locked python reports/evidence/lab6/personne2/measure_prediction.py
+```
