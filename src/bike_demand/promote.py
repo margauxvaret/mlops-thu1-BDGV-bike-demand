@@ -10,6 +10,7 @@ Usage :
     uv run --locked python -m bike_demand.promote status
     uv run --locked python -m bike_demand.promote adopt
     uv run --locked python -m bike_demand.promote promote --candidate <dir> --decision <json> --expected-incumbent <id|none>
+    uv run --locked python -m bike_demand.promote restore --version <id> --expected-incumbent <id>
 """
 
 from __future__ import annotations
@@ -91,6 +92,22 @@ def verify_bundle(version_dir: Path) -> dict:
             f"{metadata.get('model_sha256')}, trouvé {actual}. Ne pas charger."
         )
     return metadata
+
+
+def _current_id(accepted: Path) -> str:
+    current = read_pointer(accepted)
+    return current["version_id"] if current else "none"
+
+
+def _check_incumbent(accepted: Path, expected_incumbent: str) -> str:
+    """Compare-and-swap : l'état courant doit être celui vu au moment de décider."""
+    current_id = _current_id(accepted)
+    if current_id != expected_incumbent:
+        raise RuntimeError(
+            f"incumbent changé : attendu {expected_incumbent}, "
+            f"trouvé {current_id}. Refaire la décision."
+        )
+    return current_id
 
 
 def _next_version_id(accepted: Path) -> str:
@@ -200,14 +217,8 @@ def promote(
         )
 
     with accepted_lock(accepted):
-        # 3) L'incumbent n'a pas changé depuis la décision (compare-and-swap).
-        current = read_pointer(accepted)
-        current_id = current["version_id"] if current else "none"
-        if current_id != expected_incumbent:
-            raise RuntimeError(
-                f"incumbent changé : attendu {expected_incumbent}, "
-                f"trouvé {current_id}. Refaire la décision."
-            )
+        # 3) L'incumbent n'a pas changé depuis la décision.
+        current_id = _check_incumbent(accepted, expected_incumbent)
 
         # 4) Installer la nouvelle version, immuable, avant de toucher au pointeur.
         version_id = _next_version_id(accepted)
@@ -238,6 +249,34 @@ def promote(
         return pointer
 
 
+def restore(
+    version_id: str, expected_incumbent: str, accepted: Path = ACCEPTED
+) -> dict:
+    """Remet une version déjà acceptée comme courante, sans réentraîner."""
+    target = accepted / "versions" / version_id
+    if not target.is_dir():
+        raise RuntimeError(f"version inconnue : {version_id} ({target} absent)")
+
+    with accepted_lock(accepted):
+        current_id = _check_incumbent(accepted, expected_incumbent)
+        if current_id == version_id:
+            raise RuntimeError(f"{version_id} est déjà la version courante")
+
+        # Vérifier les octets AVANT de basculer : un checksum faux échoue fermé.
+        metadata = verify_bundle(target)
+
+        pointer = {
+            "version_id": version_id,
+            "model_sha256": metadata["model_sha256"],
+            "model_version": metadata.get("model_version"),
+            "previous": current_id,
+            "updated_at": _now(),
+        }
+        _write_json_atomic(accepted / "CURRENT.json", pointer)
+        _append_history(accepted, {"event": "restore", **pointer})
+        return pointer
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="État accepté Lab 7.")
     parser.add_argument(
@@ -246,6 +285,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("status", help="affiche la version acceptée courante")
     sub.add_parser("adopt", help="adopte le modèle servi comme model-001")
+
     p = sub.add_parser("promote", help="promeut un candidat décidé 'accept'")
     p.add_argument("--candidate", required=True, type=Path)
     p.add_argument("--decision", required=True, type=Path)
@@ -254,17 +294,26 @@ def main(argv: list[str] | None = None) -> int:
         required=True,
         help="version_id vu au moment de la décision, ou 'none'",
     )
+
+    r = sub.add_parser("restore", help="remet une version acceptée, sans réentraîner")
+    r.add_argument("--version", required=True)
+    r.add_argument(
+        "--expected-incumbent", required=True, help="version_id courant attendu"
+    )
+
     args = parser.parse_args(argv)
 
     if args.command == "status":
-        print(json.dumps(read_pointer(args.accepted), indent=2, sort_keys=True))
+        result = read_pointer(args.accepted)
     elif args.command == "adopt":
-        print(json.dumps(adopt(args.accepted), indent=2, sort_keys=True))
+        result = adopt(args.accepted)
     elif args.command == "promote":
         result = promote(
             args.candidate, args.decision, args.expected_incumbent, args.accepted
         )
-        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        result = restore(args.version, args.expected_incumbent, args.accepted)
+    print(json.dumps(result, indent=2, sort_keys=True))
     return 0
 
 
