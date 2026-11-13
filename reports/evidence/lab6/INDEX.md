@@ -6,8 +6,8 @@ Les liens de runs GitHub Actions expirent : les logs bruts sont copiés ici, en 
 |---|---|---|---|---|---|
 | `01-pr16-rouge.txt` / `01-pr16-rouge-failed.txt` | [43183335657](https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand/actions/runs/43183335657) | `12b519d` | [#16](https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand/pull/16) | ❌ failure (19 s) | l'étape `Lint (ruff)` attrape `I001` dans `scripts/check_deployment.py` |
 | `02-pr16-vert.txt` | [43184757992](https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand/actions/runs/43184757992) | `973ba53` | [#16](https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand/pull/16) | ✅ success (36 s) | la correction passe toutes les étapes : lock, lint, format, preflight, tests |
-| `03-deploy.txt` | à compléter (P3) | | | | déploiement d'une nouvelle révision Cloud Run |
-| `04-identite.txt` | à compléter (P3) | | | | `git_sha`, `model_version`, `model_sha256` de l'URL en ligne |
+| `03-deploy-run.txt` | [43433382970](https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand/actions/runs/43433382970) | `8144cad` | #20 (push on `main`) | ✅ success | new revision `00018-jm6` deployed by digest, 100 % traffic, previous `00017-rw6` |
+| `deploy/deploy-evidence-8144cad…/live-check.txt` | same run | `8144cad` | | ✅ 7/7 PASS | live URL serves `git_sha` 8144cad, `model_version` baseline-3231526734d2, `model_sha256` fd98ceaf… |
 
 ## Rouge vers vert (PR #16)
 

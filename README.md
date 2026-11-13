@@ -642,3 +642,55 @@ uv run --locked python reports/evidence/lab6/personne2/measure_prediction.py
 uv run --locked pytest -q tests/test_api.py
 uv run --locked python reports/evidence/lab6/personne2/measure_prediction.py
 ```
+### Lab 6: Deployment (Person 3)
+
+#### Gate: what must be true before a deploy starts?
+
+- **Our choice:** the `deploy` job has `needs: [checks, image]` and
+  `if: github.event_name == 'push' && github.ref == 'refs/heads/main'`. It runs only
+  after a merge to `main`, and only if lint, tests and the outside image check are
+  all green. On pull requests it shows as `skipped` (PR #18, PR #20). Its own
+  `concurrency` group is never cancelled, so a deploy never stops halfway.
+- **Rejected option:** deploying on every push to `integration`, a separate deploy
+  workflow, or a manual `gcloud run deploy` from a laptop.
+- **Why:** only reviewed, merged code that passed every check reaches the service.
+  A separate workflow or a laptop could deploy a commit whose checks failed.
+
+#### Identity: how do we know what is deployed, and who deploys it?
+
+- **Our choice:** the image is built from the run's commit with
+  `GIT_SHA=$GITHUB_SHA`, tagged with that commit and deployed **by digest**. The
+  model files are copied from the bucket and checked with
+  `sha256sum -c deploy/model.sha256` before the deploy. Login is keyless:
+  `id-token: write` and Workload Identity Federation, with no stored key.
+- **Rejected option:** a `:latest` tag, and a service-account JSON key in GitHub secrets.
+- **Why:** a tag can move and a digest cannot. A stored key can leak and never
+  expires; WIF gives a short-lived token to this repository's `main` job only.
+
+#### Proof: how do we know the live service is the one we built?
+
+- **Our choice:** after the deploy, the Lab 5 checker
+  (`scripts/check_deployment.py`) calls the live private URL with a short-lived ID
+  token and compares `git_sha` (the run's commit), `model_version` and
+  `model_sha256` (the files checked above). Run
+  [43433382970](https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand/actions/runs/43433382970)
+  on commit `8144cad`: revision `mlops-thu1-bdgv-bike-demand-00018-jm6`, 7/7 checks
+  PASS. Records: `reports/evidence/lab6/deploy/deploy-evidence-8144cad…/`
+  (`deploy-record.txt`, `live-check.txt`) and `reports/evidence/lab6/03-deploy-run.txt`.
+- **Rejected option:** trusting a successful `gcloud run deploy`, or a `200` on `/health`.
+- **Why:** a successful deploy only means that a revision started, not that it
+  serves this commit and this model.
+
+#### Undo: what happens if the live check fails?
+
+- **Our choice:** before deploying, the job records the revision serving traffic
+  (here `00017-rw6`). If any later step fails (including the identity check), it
+  runs `gcloud run services update-traffic --to-revisions <previous>=100` and
+  saves the traffic in `rollback.txt`. The next good deploy sends traffic back
+  with `--to-latest`.
+- **Rejected option:** rebuilding and redeploying an old commit, or rolling back
+  by hand in the console.
+- **Why:** the previous revision already exists and was verified; moving traffic
+  takes seconds and needs no rebuild. The rollback is written but was not
+  exercised: every deploy so far passed the live check (runs on `main` after
+  #18 and #20), so no `rollback.txt` exists.

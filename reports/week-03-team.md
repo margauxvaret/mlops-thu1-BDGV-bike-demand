@@ -38,8 +38,17 @@ commit on the same PR fixed it (no re-run). Raw logs: `reports/evidence/lab6/`
 
 ### Deployment trace
 
-- Commit deployed: TODO (P3)
-- Deploy run: TODO (link + `reports/evidence/lab6/03-deploy.txt`)
-- Cloud Run revision: TODO
-- Identity check (`git_sha`, `model_version`, `model_sha256`): TODO (`04-identite.txt`)
-- Undo: TODO (command that sends traffic back to the previous revision)
+### Deployment trace
+
+- Commit deployed: `8144cad` (merge of PR #20 on `main`)
+- Deploy run: [43433382970](https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand/actions/runs/43433382970), green in 2 min 41 s; full log `reports/evidence/lab6/03-deploy-run.txt`
+- Image (deployed by digest): `bdgv-api@sha256:ec187fb59e1bae856d3f3a4b9b99bbc859be103144be044e26832b609db0def6`
+- Cloud Run revision: `mlops-thu1-bdgv-bike-demand-00018-jm6`, 100 % of traffic; previous revision `00017-rw6` kept as rollback target
+- Identity check on the live URL: 7/7 PASS, including `git_sha` = `8144cad…`, `model_version` = `baseline-3231526734d2`, `model_sha256` = `fd98ceaf…c304`, valid `/predict` = 200 (68.88), `hr=24` = 422
+- Raw records: `reports/evidence/lab6/deploy/deploy-evidence-8144cad…/deploy-record.txt` and `live-check.txt`
+- Undo: on any failure after the deploy, the job runs `gcloud run services update-traffic --to-revisions <previous>=100`. It was not exercised: every deploy so far passed the live check, so no `rollback.txt` exists.
+
+### Process gaps (honest)
+
+- PRs #18 and #20 were merged directly into `main` instead of `integration`; `integration` was then synced from `main`. Future PRs target `integration`.
+- `main` was red after PR #14 (run 42598577985, ruff failure) until PR #16 fixed it.
