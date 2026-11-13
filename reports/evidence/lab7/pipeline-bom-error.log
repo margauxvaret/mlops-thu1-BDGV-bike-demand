@@ -1,0 +1,21 @@
+﻿uv : Traceback (most recent call last):
+Au caractère Ligne:1 : 1
++ uv run --locked python -m bike_demand.pipeline --settings configs/can ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand\src\bike_demand\pipeline.py", line 163, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand\src\bike_demand\pipeline.py", line 158, in main
+    print(run_pipeline(args.settings))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand\src\bike_demand\pipeline.py", line 104, in run_pipeline
+    raw = json.loads(settings_path.read_text(encoding="utf-8"))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pc\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\__init__.py", line 335, in loads
+    raise JSONDecodeError("Unexpected UTF-8 BOM (decode using utf-8-sig)",
+json.decoder.JSONDecodeError: Unexpected UTF-8 BOM (decode using utf-8-sig): line 1 column 1 (char 0)

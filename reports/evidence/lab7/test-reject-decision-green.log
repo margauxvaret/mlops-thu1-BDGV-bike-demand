@@ -1,0 +1,11 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 10 items / 9 deselected / 1 selected
+
+tests/lab7/test_promotion_state.py::test_reject_decision_leaves_state_unchanged PASSED [100%]
+
+======================= 1 passed, 9 deselected in 5.89s =======================

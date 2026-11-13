@@ -1,0 +1,21 @@
+﻿uv : Traceback (most recent call last):
+Au caractère Ligne:1 : 1
++ uv run --locked python -m bike_demand.pipeline --settings configs/can ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand\src\bike_demand\pipeline.py", line 163, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand\src\bike_demand\pipeline.py", line 158, in main
+    print(run_pipeline(args.settings))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand\src\bike_demand\pipeline.py", line 106, in run_pipeline
+    identity = build_identity(settings)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand\src\bike_demand\pipeline.py", line 74, in build_identity
+    raise RuntimeError(
+RuntimeError: arbre git sale ou état inconnu : commite avant de lancer le pipeline

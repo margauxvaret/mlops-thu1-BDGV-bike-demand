@@ -1,0 +1,30 @@
+﻿uv :    Building bike-demand @ file:///C:/Users/pc/Documents/mlops-thu1-BDGV-bike-demand
+Au caractère Ligne:2 : 1
++ uv run --locked pytest tests/lab7 -v 2>&1 | Tee-Object -FilePath "$en ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Building bik...DGV-bike-demand:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+      Built bike-demand @ file:///C:/Users/pc/Documents/mlops-thu1-BDGV-bike-demand
+Uninstalled 1 package in 5ms
+Installed 1 package in 13ms
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 10 items
+
+tests/lab7/test_promotion_state.py::test_unknown_setting_rejected PASSED [ 10%]
+tests/lab7/test_promotion_state.py::test_bool_setting_rejected PASSED    [ 20%]
+tests/lab7/test_promotion_state.py::test_out_of_bounds_setting_rejected PASSED [ 30%]
+tests/lab7/test_promotion_state.py::test_pipeline_never_references_accepted_state PASSED [ 40%]
+tests/lab7/test_promotion_state.py::test_reject_decision_leaves_state_unchanged PASSED [ 50%]
+tests/lab7/test_promotion_state.py::test_digest_mismatch_leaves_state_unchanged PASSED [ 60%]
+tests/lab7/test_promotion_state.py::test_stale_incumbent_leaves_state_unchanged PASSED [ 70%]
+tests/lab7/test_promotion_state.py::test_accept_keeps_previous_version PASSED [ 80%]
+tests/lab7/test_promotion_state.py::test_restore_corrupted_checksum_fails_closed PASSED [ 90%]
+tests/lab7/test_promotion_state.py::test_restore_without_retraining PASSED [100%]
+
+============================= 10 passed in 8.62s ==============================

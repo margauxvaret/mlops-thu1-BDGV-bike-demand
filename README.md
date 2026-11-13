@@ -694,3 +694,78 @@ uv run --locked python reports/evidence/lab6/personne2/measure_prediction.py
   takes seconds and needs no rebuild. The rollback is written but was not
   exercised: every deploy so far passed the live check (runs on `main` after
   #18 and #20), so no `rollback.txt` exists.
+
+## Pipeline and gate (Lab 7)
+
+La politique et les décisions du gate sont décrites par B : [lien vers la politique] · [lien vers les décisions].
+
+### Point d'entrée
+
+Depuis un clone propre, avec l'arbre git commité :
+
+```bash
+uv sync --locked
+uv run --locked python -m bike_demand.pipeline --settings configs/candidates/rf-default.json
+```
+
+Le pipeline produit un candidat dans `artifacts/candidates/<run_id>/` (`model.joblib` + `manifest.json`, `status: candidate`). Il n'écrit jamais dans l'état accepté.
+
+### État accepté
+
+```
+artifacts/accepted/
+  versions/<version_id>/   model.joblib, model-metadata.json, manifest.json (lecture seule)
+  CURRENT.json             version courante + previous (remplacé atomiquement)
+  HISTORY.jsonl            journal en ajout seul (adopt, promote, restore)
+```
+
+```bash
+uv run --locked python -m bike_demand.promote status
+uv run --locked python -m bike_demand.promote promote --candidate artifacts/candidates/<run_id> --decision <decision.json> --expected-incumbent <version_id>
+uv run --locked python -m bike_demand.promote restore --version <version_id> --expected-incumbent <version_id>
+```
+
+`model-001` a été adopté depuis le modèle servi au Lab 5 (`baseline-3231526734d2`, sha256 `fd98ceaf…c304`). C'est une adoption, pas une décision de gate.
+
+### Choix de conception (choix / alternative écartée / raison)
+
+| Mot-clé | Choix | Alternative écartée | Raison |
+|---|---|---|---|
+| stage | Deux espaces : `candidates/` puis `accepted/` | Écrire directement dans `artifacts/` (comportement de `train.py`) | Un candidat ne doit jamais devenir l'état servi sans décision |
+| entry point | Un seul module, `bike_demand.pipeline --settings <json>` | Modifier `train.py` | `train.py` porte les tests du Lab 2 ; le nouveau module est le seul point d'entrée documenté |
+| failure | Échec fermé : toute garde ratée lève une erreur avant d'écrire | Continuer avec un avertissement | Une preuve absente n'est pas un succès |
+| partial | Dossier temporaire puis `os.replace` ; suppression du temporaire en cas d'erreur | Écrire les fichiers un par un | Le candidat apparaît complet ou pas du tout |
+| identity | `run_id` = hash du CSV, de `uv.lock`, de l'arbre `src/bike_demand`, des réglages validés et des 12 features | Utiliser le SHA du commit | Un commit qui n'ajoute que des preuves ne doit pas changer l'identité ; le SHA du commit reste dans le manifest comme provenance |
+| separate | Le pipeline ne connaît pas le chemin `accepted` (vérifié par un test) | Un seul dossier avec un statut dans le manifest | La séparation est vérifiable sans lire de manifest |
+| switch | Nouvelle version installée d'abord, puis pointeur `CURRENT.json` remplacé atomiquement | Copier le modèle par-dessus l'ancien | Un arrêt au milieu laisse l'ancien pointeur valide |
+| concurrent | Verrou `O_EXCL` + compare-and-swap sur `--expected-incumbent` | Aucun contrôle | Une décision prise contre `model-001` ne doit pas s'appliquer si l'incumbent a changé |
+| retain | `versions/` immuable + `previous` dans le pointeur + `HISTORY.jsonl` | Garder seulement le dernier modèle | La version remplacée se restaure sans réentraîner |
+
+### Récupérer le bundle accepté sans réentraîner
+
+```bash
+uv run --locked python -m bike_demand.promote restore --version model-001 --expected-incumbent <version courante>
+```
+
+L'API peut aussi servir directement une version retenue : `MODEL_DIR=artifacts/accepted/versions/<version_id>`. `restore` vérifie le checksum avant de basculer ; un checksum différent échoue fermé.
+
+### Preuves
+
+Toutes les preuves brutes sont dans `reports/evidence/lab7/` :
+
+- `baseline-before.log` : suite de tests de référence avant Lab 7 ;
+- `pipeline-bom-error.log`, `pipeline-select-features-error.log` : échecs réels, sans sortie partielle ;
+- `pipeline-rerun-dirty-tree.log` : arbre sale refusé ;
+- `pipeline-run-a.log`, `pipeline-run-b-idempotent.log` : relancement idempotent malgré un commit de preuve ;
+- `adopt-model-001.log`, `current-after-adopt.json` : initialisation de l'état accepté ;
+- `tests-lab7-green.log`, `test-reject-decision-red.log`, `test-reject-decision-green.log` : tests et preuve qu'ils peuvent échouer.
+
+### Limites connues
+
+- Trois entraînements ont produit le même sha256 sur cette machine, mais `joblib` n'est pas garanti identique octet pour octet d'une machine à l'autre. L'idempotence repose donc sur le `run_id`, pas sur le sha du modèle.
+- `artifacts/` est ignoré par Git : une machine propre, la CI ou l'image Docker n'ont pas les bundles acceptés. Leur stockage durable reste à décider (bloquant pour le rollback du Lab 8).
+- Un processus tué pendant une opération peut laisser `artifacts/accepted/.lock`. Après avoir vérifié qu'aucune opération ne tourne, il faut le supprimer à la main.
+- Sous Windows, la lecture seule s'applique aux fichiers, pas aux dossiers.
+- Les fichiers de réglages doivent être en UTF-8 sans BOM (Windows PowerShell 5 en ajoute un par défaut) : le pipeline refuse le fichier plutôt que de le lire à moitié.
+- `train.py` écrit toujours directement dans `artifacts/`. Ce n'est pas le point d'entrée Lab 7 et il ne doit pas être utilisé pour produire un candidat.
+- Le candidat `f1ef583843adf9bd` a les mêmes octets que `model-001` : l'accepter ne démontrerait aucune amélioration de précision.

@@ -1,0 +1,27 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\pc\Documents\mlops-thu1-BDGV-bike-demand
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 10 items / 9 deselected / 1 selected
+
+tests/lab7/test_promotion_state.py::test_reject_decision_leaves_state_unchanged FAILED [100%]
+
+================================== FAILURES ===================================
+_________________ test_reject_decision_leaves_state_unchanged _________________
+
+state = (WindowsPath('C:/Users/pc/AppData/Local/Temp/pytest-of-pc/pytest-25/test_reject_decision_leaves_st0/accepted'), Window...bbcfc0b9a9d8eec', WindowsPath('C:/Users/pc/AppData/Local/Temp/pytest-of-pc/pytest-25/test_reject_decision_leaves_st0'))
+
+    def test_reject_decision_leaves_state_unchanged(state):
+        """Défaut : une décision 'reject' modifie l'état accepté."""
+        accepted, cand, cand_sha, tmp = state
+        before = _snapshot(accepted)
+>       with pytest.raises(RuntimeError, match="promotion refusée"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests\lab7\test_promotion_state.py:114: Failed
+=========================== short test summary info ===========================
+FAILED tests/lab7/test_promotion_state.py::test_reject_decision_leaves_state_unchanged
+======================= 1 failed, 9 deselected in 7.50s =======================
