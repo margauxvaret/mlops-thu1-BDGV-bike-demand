@@ -1,0 +1,12 @@
+commit:            8144cad8969ae96e6eeab5bfe5098c229ef6999e
+image:             europe-west1-docker.pkg.dev/mlops-ece-group2/cloud-run-source-deploy/bdgv-api@sha256:ec187fb59e1bae856d3f3a4b9b99bbc859be103144be044e26832b609db0def6
+previous revision: mlops-thu1-bdgv-bike-demand-00017-rw6
+new revision:      mlops-thu1-bdgv-bike-demand-00018-jm6
+url:               https://mlops-thu1-bdgv-bike-demand-1087566946792.europe-west1.run.app
+run:               https://github.com/margauxvaret/mlops-thu1-BDGV-bike-demand/actions/runs/43433382970
+traffic:
+status:
+  traffic:
+  - latestRevision: true
+    percent: 100
+    revisionName: mlops-thu1-bdgv-bike-demand-00018-jm6
