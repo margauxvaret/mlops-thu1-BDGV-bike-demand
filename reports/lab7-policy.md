@@ -1,0 +1,12 @@
+# Lab 7 — politique de décision v1
+
+Cette politique est fixée avant toute évaluation de la partie B. Budget : au plus trois configurations candidates distinctes. Toute modification de cette politique doit faire l'objet d'un nouveau commit motivé et précéder les évaluations auxquelles elle s'applique.
+
+Validation : exactement les 4 358 lignes du 1er janvier au 30 juin 2012, triées par date, heure et instant, et leurs mêmes labels cnt. Le train est l'année 2011 ; la baseline naïve prédit sa moyenne de cnt. Aucune métrique sur le test. La MAE est la moyenne des erreurs absolues, en vélos/heure. Un ancien score n'est réutilisable que si les SHA-256 des octets du modèle et des données, et l'identité ordonnée des lignes et labels de validation correspondent ; sinon recalculer, ou déclarer manquant.
+
+Les trois critères sont obligatoires :
+1. Qualité : MAE strictement inférieure à celle de la baseline naïve et au plus MAE de model-001 moins 1 vélo/heure. Une baisse d'au moins un vélo/heure est une marge pratique explicite, choisie avant mesure, pour éviter de promouvoir un gain négligeable. Exception d'équivalence : des octets identiques à model-001 satisfont la comparaison à celui-ci, sans prétendre à une amélioration, sous réserve de tous les autres contrôles. L'égalité exacte à la marge est acceptée.
+2. Opération : fichier modèle au plus 50 Mio, limite simple et reproductible pour le stockage et le chargement du service ; égalité acceptée. Ce n'est pas une garantie de latence.
+3. Intégrité : SHA-256 des données égal au snapshot commité, contrôles de données existants du cours 7 et tailles des partitions, 12 features dans l'ordre canonique dans le manifest et le modèle, et SHA-256 des octets du candidat égal à celui du manifest. Vérifier le modèle accepté model-001 et son empreinte avant utilisation. Les données et le modèle doivent être accessibles.
+
+Une preuve absente ne devient jamais un succès par compensation. Statuts et codes CI : accept=0 ; invalid=2 (entrée ou preuve contradictoire/malformée) ; missing=3 (contrôle requis non exécuté ou résultat indisponible) ; rejected=4 (mesure valide hors seuil) ; blocked=5 (dépendance ou état à réparer, notamment incumbent introuvable ou différent). En présence de plusieurs problèmes, priorité invalid, blocked, missing, rejected, accept. La décision contient status, model_sha256 et expected_incumbent=model-001 ; tout statut autre que accept est refusé par la promotion. Les erreurs inattendues échouent fermé.
