@@ -1,0 +1,40 @@
+{
+  "status": "rejected",
+  "model_sha256": "61e0fe0544b2827ce841e8ca9ba2a714fd939d7e6e10d89a17e708db94f40b69",
+  "expected_incumbent": "model-001",
+  "candidate": "12d65c86c763c029",
+  "policy": "reports/lab7-policy.md",
+  "checks": {
+    "integrity": {
+      "status": "accept",
+      "reason": "snapshot, données, features et modèle vérifiés"
+    },
+    "operation": {
+      "status": "accept",
+      "reason": "taille 9825 / 52428800 octets"
+    },
+    "naive": {
+      "status": "accept",
+      "reason": "MAE 106.59444946982447 contre naïve 154.23179306864967"
+    },
+    "incumbent": {
+      "status": "rejected",
+      "reason": "MAE 106.59444946982447 contre incumbent 86.84685685591091, marge 1"
+    }
+  },
+  "reasons": [
+    "incumbent: MAE 106.59444946982447 contre incumbent 86.84685685591091, marge 1"
+  ],
+  "evidence": {
+    "data_sha256": "e03de4ee4ef4dc376ac6e04bf829673c6269e8eba5c60fa121640fa2f829504f",
+    "validation_rows": 4358,
+    "validation_rows_labels_sha256": "2552c0024cc7e8d973749be7206ef3009444e4a1c4e0f8044cc46000fc63f79d",
+    "model_bytes": 9825,
+    "candidate_mae": 106.59444946982447,
+    "naive_mae": 154.23179306864967,
+    "train_mean": 143.79444765760556,
+    "incumbent_mae": 86.84685685591091,
+    "incumbent_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304",
+    "equivalent": false
+  }
+}

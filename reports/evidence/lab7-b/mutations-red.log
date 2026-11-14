@@ -1,0 +1,41 @@
+FFF..                                                                    [100%]
+================================== FAILURES ===================================
+______________________ test_missing_control_fails_closed ______________________
+
+    def test_missing_control_fails_closed():
+        checks = complete()
+        del checks["operation"]
+>       assert decide(checks)[0] == "missing"
+E       AssertionError: assert 'accept' == 'missing'
+E         
+E         - missing
+E         + accept
+
+tests\lab7\test_gate.py:11: AssertionError
+____________________ test_invalid_result_is_never_accepted ____________________
+
+    def test_invalid_result_is_never_accepted():
+        checks = complete()
+        checks["integrity"] = ("bogus", "invalid input")
+>       assert decide(checks)[0] == "invalid"
+E       AssertionError: assert 'accept' == 'invalid'
+E         
+E         - invalid
+E         + accept
+
+tests\lab7\test_gate.py:17: AssertionError
+__________________________ test_equal_margin_passes ___________________________
+
+    def test_equal_margin_passes():
+>       assert quality(9.0, 20.0, 10.0, False) == (True, True)
+E       assert (True, False) == (True, True)
+E         
+E         At index 1 diff: False != True
+E         Use -v to get more diff
+
+tests\lab7\test_gate.py:21: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/lab7/test_gate.py::test_missing_control_fails_closed - Assertion...
+FAILED tests/lab7/test_gate.py::test_invalid_result_is_never_accepted - Asser...
+FAILED tests/lab7/test_gate.py::test_equal_margin_passes - assert (True, Fals...
+3 failed, 2 passed in 20.19s

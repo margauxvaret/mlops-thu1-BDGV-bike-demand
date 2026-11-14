@@ -1,0 +1,36 @@
+{
+  "git_sha": "01f25f2fb9d88f184f6302b5291baef1ae2e7bb9",
+  "identity": {
+    "code_tree_sha": "0f95f2203d8cfc7d59dc65d2a7a7807e7b0db59e",
+    "data_sha256": "e03de4ee4ef4dc376ac6e04bf829673c6269e8eba5c60fa121640fa2f829504f",
+    "features": [
+      "season",
+      "yr",
+      "mnth",
+      "hr",
+      "holiday",
+      "weekday",
+      "workingday",
+      "weathersit",
+      "temp",
+      "atemp",
+      "hum",
+      "windspeed"
+    ],
+    "lock_sha256": "60596eed1037028ccf7050acb8dd37968eb6718b3229f6671a8d8afb720c70c3",
+    "settings": {
+      "max_depth": 10,
+      "min_samples_leaf": 1,
+      "n_estimators": 50,
+      "n_jobs": 1,
+      "random_state": 42
+    }
+  },
+  "model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304",
+  "rows": {
+    "train": 8645,
+    "validation": 4358
+  },
+  "run_id": "479eb51de23a3fff",
+  "status": "candidate"
+}

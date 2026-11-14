@@ -769,3 +769,7 @@ Toutes les preuves brutes sont dans `reports/evidence/lab7/` :
 - Les fichiers de réglages doivent être en UTF-8 sans BOM (Windows PowerShell 5 en ajoute un par défaut) : le pipeline refuse le fichier plutôt que de le lire à moitié.
 - `train.py` écrit toujours directement dans `artifacts/`. Ce n'est pas le point d'entrée Lab 7 et il ne doit pas être utilisé pour produire un candidat.
 - Le candidat `f1ef583843adf9bd` a les mêmes octets que `model-001` : l'accepter ne démontrerait aucune amélioration de précision.
+
+## Lab 7 — politique et décisions de la personne B
+
+La [politique fixée avant évaluation](reports/lab7-policy.md), les [décisions](reports/decisions/) et le [rapport de preuve](reports/lab7-partie-b.md) décrivent la comparaison, les statuts et le rejet. Exécuter `uv run --locked python -m bike_demand.gate --candidate artifacts/candidates/<run_id> --output reports/decisions/<run_id>.json`. Charger uniquement des fichiers joblib locaux de confiance. Les modèles et l'état accepté sont exclus de Git : les restaurer ou les reconstruire et vérifier leurs empreintes pour reproduire.
