@@ -1,0 +1,50 @@
+{"ts": "2026-11-14T14:20:24.232+00:00", "level": "INFO", "event": "model_loaded", "model_dir": "artifacts", "model_version": "baseline-3231526734d2", "model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304", "git_sha": "unknown"}
+{"ts": "2026-11-14T14:20:24.582+00:00", "level": "INFO", "event": "model_loaded", "model_dir": "artifacts", "model_version": "baseline-3231526734d2", "model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304", "git_sha": "unknown"}
+{
+  "before": {
+    "status": {
+      "model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304",
+      "model_version": "baseline-3231526734d2",
+      "previous": null,
+      "updated_at": "2026-11-14T14:12:13.064733+00:00",
+      "version_id": "model-001"
+    },
+    "accepted_model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304",
+    "served_model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304",
+    "health": {
+      "status": "ok",
+      "model_version": "baseline-3231526734d2",
+      "model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304",
+      "git_sha": "unknown"
+    },
+    "health_code": 200,
+    "prediction": {
+      "prediction": 68.88371887808488,
+      "model_version": "baseline-3231526734d2"
+    }
+  },
+  "promotion_error": "promotion refus\u00e9e : d\u00e9cision 'rejected', pas 'accept'",
+  "after": {
+    "status": {
+      "model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304",
+      "model_version": "baseline-3231526734d2",
+      "previous": null,
+      "updated_at": "2026-11-14T14:12:13.064733+00:00",
+      "version_id": "model-001"
+    },
+    "accepted_model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304",
+    "served_model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304",
+    "health": {
+      "status": "ok",
+      "model_version": "baseline-3231526734d2",
+      "model_sha256": "fd98ceafc57a5babce61ce703cbf9cb8d1f83c6820b0b34fe30ad1a0fc49c304",
+      "git_sha": "unknown"
+    },
+    "health_code": 200,
+    "prediction": {
+      "prediction": 68.88371887808488,
+      "model_version": "baseline-3231526734d2"
+    }
+  },
+  "unchanged": true
+}
